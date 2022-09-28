@@ -2,6 +2,8 @@ FROM php:apache-buster
 
 ARG XDEBUG_PORT
 
+RUN useradd -m -d /home/dev -s /bin/bash dev
+
 # install
 RUN set -eux && \
     apt update && \

@@ -19,9 +19,9 @@
 Dockerファイル一式が準備されています。以下のコマンドで起動できます。
 
 ```shell
-$ cd ./docker
-$ ./dockersetup.sh
-$ docker-compose up -d --build
+cd ./docker
+./dockersetup.sh
+docker-compose up -d --build
 ```
 
 dockersetup.shではdevcontainerと同じ階層に.envをコピーしています。  

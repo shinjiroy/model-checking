@@ -4,5 +4,6 @@
        "../../docker-compose.yml"
     ],
     "service": "frontend",
-    "workspaceFolder": "/var/www/"
+    "workspaceFolder": "/var/www/",
+    "remoteUser": "dev"
  }

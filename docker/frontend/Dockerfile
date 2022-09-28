@@ -2,6 +2,8 @@ FROM httpd:2.4-buster
 
 ARG NODEJS_VERSION
 
+RUN useradd -m -d /home/dev -s /bin/bash dev
+
 # install
 RUN set -eux && \
     apt update && \
