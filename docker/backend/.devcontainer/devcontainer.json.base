@@ -1,0 +1,9 @@
+{
+   "name": "model-checking-backend",
+   "dockerComposeFile": [
+      "../../docker-compose.yml"
+   ],
+   "service": "backend",
+   "workspaceFolder": "/var/www/",
+   "remoteUser": "dev"
+}

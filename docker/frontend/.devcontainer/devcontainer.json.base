@@ -1,0 +1,9 @@
+{
+    "name": "model-checking-frontend",
+    "dockerComposeFile": [
+       "../../docker-compose.yml"
+    ],
+    "service": "frontend",
+    "workspaceFolder": "/var/www/",
+    "remoteUser": "dev"
+ }

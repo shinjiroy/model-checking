@@ -1,4 +1,5 @@
 .env
+devcontainer.json
 docker/logs/apache/access_log
 docker/logs/apache/error_log
 docker/logs/apache/error.log
