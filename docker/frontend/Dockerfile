@@ -1,8 +1,11 @@
 FROM httpd:2.4-buster
 
 ARG NODEJS_VERSION
+ARG DEV_USER_UID
+ARG DEV_USER_GID
 
-RUN useradd -m -d /home/dev -s /bin/bash dev
+RUN groupadd -g ${DEV_USER_GID} docker && \
+    useradd -u ${DEV_USER_UID} -g docker -G www-data -m -d /home/dev -s /bin/bash dev
 
 # install
 RUN set -eux && \

@@ -25,4 +25,7 @@ docker-compose up -d --build
 ```
 
 dockersetup.shではdevcontainerと同じ階層に.envをコピーしています。  
-これはVisual Studio Codeの拡張機能[Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)がdocker-compose.ymlと同じ階層の.envを参照してくれない不具合があるため、その対策です。
+これはVisual Studio Codeの拡張機能[Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)がdocker-compose.ymlと同じ階層の.envを参照してくれない不具合があるため、その対策です。  
+不要ならdockersetup.shは実行しなくても良いです。
+
+コンテナ内のユーザーdevはdockerというグループに属させています。Windows(WSL無し)やMacで使う時はあまり意味が無いですが、Windows(WSL有り)やLinuxで起動する場合にコンテナ外からコンテナ内にマウントしたファイルを編集するために行っています。
