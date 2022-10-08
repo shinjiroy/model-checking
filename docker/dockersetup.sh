@@ -1,7 +1,5 @@
 #!/bin/bash
 
-name=modelchecking
-
 if [ ! -e '.env' ]; then
     cp .env.base .env
 fi
@@ -12,10 +10,6 @@ fi
 
 if [ ! -e './frontend/.env' ]; then
     cp .env.base ./frontend/.env
-fi
-
-if [ -z "$(docker-compose ps | grep ${name})" ]; then
-    docker-compose up -d --build
 fi
 
 if [ ! -e './backend/.devcontainer/devcontainer.json' ]; then
