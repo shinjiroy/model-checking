@@ -28,7 +28,6 @@ RUN set -eux && \
     sed -i \
     -e "/^;*date\.timezone/c date.timezone = Asia/Tokyo" \
     -e "/^;*mbstring\.language/c mbstring.language = Japanese" \
-    -e "/^;*auto_detect_line_endings/c auto_detect_line_endings = on" \
     -e "/^;*output_handler/c output_handler = mb_output_handler" \
     -e "/^;*mbstring\.encoding_translation/c mbstring.encoding_translation = on" \
     -e "/^;*mbstring\.detect_order/c mbstring.detect_order = auto" \
