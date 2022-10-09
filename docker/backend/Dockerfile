@@ -38,6 +38,7 @@ RUN set -eux && \
     -e "/^;*opcache\.interned_strings_buffer\=/c opcache.interned_strings_buffer=8" \
     -e "/^;*opcache\.max_accelerated_files\=/c opcache.max_accelerated_files=4000" \
     -e "/^;*opcache\.revalidate_freq\=/c opcache.revalidate_freq=60" \
+    -e "/^*upload_max_filesize\=/c upload_max_filesize=20M" \
     -e "$ a [xdebug]" \
     -e "$ a xdebug.mode=debug" \
     -e "$ a xdebug.client_host=host.docker.internal" \
