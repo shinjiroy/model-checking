@@ -28,7 +28,6 @@ RUN set -eux && \
     sed -i \
     -e "/^;*date\.timezone/c date.timezone = Asia/Tokyo" \
     -e "/^;*mbstring\.language/c mbstring.language = Japanese" \
-    -e "/^;*auto_detect_line_endings/c auto_detect_line_endings = on" \
     -e "/^;*output_handler/c output_handler = mb_output_handler" \
     -e "/^;*mbstring\.encoding_translation/c mbstring.encoding_translation = on" \
     -e "/^;*mbstring\.detect_order/c mbstring.detect_order = auto" \
@@ -39,6 +38,7 @@ RUN set -eux && \
     -e "/^;*opcache\.interned_strings_buffer\=/c opcache.interned_strings_buffer=8" \
     -e "/^;*opcache\.max_accelerated_files\=/c opcache.max_accelerated_files=4000" \
     -e "/^;*opcache\.revalidate_freq\=/c opcache.revalidate_freq=60" \
+    -e "/^*upload_max_filesize\=/c upload_max_filesize=20M" \
     -e "$ a [xdebug]" \
     -e "$ a xdebug.mode=debug" \
     -e "$ a xdebug.client_host=host.docker.internal" \
