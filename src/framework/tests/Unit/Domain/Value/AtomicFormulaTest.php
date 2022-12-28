@@ -19,8 +19,8 @@ class AtomicFormulaTest extends TestCase
             return true;
         };
 
-        $formula = new AtomicFormula($func);
-        $this->assertSame(true, $formula());
+        $fml = new AtomicFormula($func);
+        $this->assertSame(true, $fml());
     }
 
     /**
