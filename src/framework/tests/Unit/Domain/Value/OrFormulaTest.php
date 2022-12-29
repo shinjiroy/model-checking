@@ -38,8 +38,6 @@ class OrFormulaTest extends TestCase
     public function test_invoke_arg_oneside()
     {
         $func1 = function ($arg1, $arg2) {
-            // var_dump($arg1);
-            // var_dump($arg2);
             return (bool)$arg1;
         };
         $func2 = function () {
@@ -51,7 +49,7 @@ class OrFormulaTest extends TestCase
         $fml = new OrFormula($fml1, $fml2);
 
         $fml1Arg = ['test', 0];
-        // $fml2Arg = [];
+        // $fml2Arg = []; // 2番目が引数が無い論理式の場合は指定しなくて良い
         $this->assertSame(true, $fml($fml1Arg));
         $fml1Arg = [false, 0];
         // $fml2Arg = [];
@@ -67,8 +65,6 @@ class OrFormulaTest extends TestCase
     public function test_invoke_arg_both()
     {
         $func1 = function ($arg1, $arg2) {
-            // var_dump($arg1);
-            // var_dump($arg2);
             return (bool)$arg1;
         };
         $func2 = function ($arg1) {
