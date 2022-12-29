@@ -1,10 +1,10 @@
 <?php
 
-namespace Domain\Automaton;
+namespace Domain\Model\Automaton;
 
-use Domain\Value\Event;
-use Domain\Value\State;
-use Domain\Value\Transition;
+use Domain\Value\Event\Event;
+use Domain\Value\State\State;
+use Domain\Value\Transition\Transition;
 
 /**
  * (有限)オートマトン

@@ -1,7 +1,13 @@
 <?php
 
-namespace Domain\Value;
+namespace Domain\Value\Transition;
 
+use Domain\Value\State\State;
+use Domain\Value\Event\Event;
+
+/**
+ * 状態遷移
+ */
 class Transition
 {
     protected State $from;

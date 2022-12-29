@@ -1,7 +1,10 @@
 <?php
 
-namespace Domain\Value;
+namespace Domain\Value\Event;
 
+/**
+ * 状態遷移イベント
+ */
 class Event
 {
     protected string $label;

@@ -1,7 +1,10 @@
 <?php
 
-namespace Domain\Value;
+namespace Domain\Value\State;
 
+/**
+ * 状態
+ */
 class State
 {
     /**
@@ -31,6 +34,7 @@ class State
 
     public function equals(self $state) : bool
     {
+        // 参照まで一致する必要はない
         return $this == $state;
     }
 }
