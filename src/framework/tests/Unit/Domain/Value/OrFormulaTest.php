@@ -26,7 +26,7 @@ class OrFormulaTest extends TestCase
         $fml1 = new AtomicFormula($func1);
         $fml2 = new AtomicFormula($func2);
         $fml = new OrFormula($fml1, $fml2);
-        $this->assertSame(true, $fml());
+        $this->assertSame(true, $fml()); // true or false
     }
 
     /**
@@ -50,10 +50,10 @@ class OrFormulaTest extends TestCase
 
         $fml1Arg = ['test', 0];
         // $fml2Arg = []; // 2番目が引数が無い論理式の場合は指定しなくて良い
-        $this->assertSame(true, $fml($fml1Arg));
+        $this->assertSame(true, $fml($fml1Arg)); // true or false
         $fml1Arg = [false, 0];
         // $fml2Arg = [];
-        $this->assertSame(false, $fml($fml1Arg));
+        $this->assertSame(false, $fml($fml1Arg)); // false or false
     }
 
     /**
@@ -77,9 +77,9 @@ class OrFormulaTest extends TestCase
 
         $fml1Arg = ['test', 0];
         $fml2Arg = ['111'];
-        $this->assertSame(true, $fml($fml1Arg, $fml2Arg));
+        $this->assertSame(true, $fml($fml1Arg, $fml2Arg)); // true or true
         $fml1Arg = [false, 0];
         $fml2Arg = [''];
-        $this->assertSame(false, $fml($fml1Arg, $fml2Arg));
+        $this->assertSame(false, $fml($fml1Arg, $fml2Arg)); // false or false
     }
 }
