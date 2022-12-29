@@ -3,7 +3,7 @@
 namespace Domain\Value\Logic\Formula;
 
 /**
- * 否定論理式
+ * 否定論理式(not A)
  */
 class NotFormula implements Formula
 {

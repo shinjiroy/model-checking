@@ -3,7 +3,7 @@
 namespace Domain\Value\Logic\Formula;
 
 /**
- * 論理和
+ * 論理和(A or B)
  * 
  * $fml = new OrFormula($fml1, $fml2);
  * $fml1Arg = [];
