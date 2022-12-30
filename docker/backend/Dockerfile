@@ -10,7 +10,7 @@ RUN groupadd -g ${DEV_USER_GID} docker && \
 # install
 RUN set -eux && \
     apt update && \
-    apt -y install wkhtmltopdf libpng-dev libjpeg-dev libfreetype6-dev libicu-dev libzip-dev libxml2-dev libonig-dev && \
+    apt -y install libpng-dev libjpeg-dev libfreetype6-dev libicu-dev libzip-dev libxml2-dev libonig-dev && \
     pecl install redis xdebug && \
     cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
     a2enmod rewrite && \
