@@ -1,0 +1,3 @@
+[submodule "src/framework/core"]
+	path = src/framework/core
+	url = git@github.com:shinjiroy/model-checking-core.git
