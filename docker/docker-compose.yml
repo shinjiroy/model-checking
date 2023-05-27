@@ -5,7 +5,6 @@ services:
     build:
       context: ./backend
       args:
-        - XDEBUG_PORT=${XDEBUG_PORT}
         - DEV_USER_UID=${LOCAL_USER_UID}
         - DEV_USER_GID=${LOCAL_USER_GID}
     ports:
@@ -14,6 +13,7 @@ services:
       - ../src:/var/www
       - ./logs/php:/var/log/php
       - ./logs/apache:/var/log/apache2
+      - ./backend/php.ini:/usr/local/etc/php/php.ini
     working_dir: /var/www
     environment:
       - DB_CONNECTION=mysql
@@ -27,7 +27,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=null
-      - MAIL_PORT=1025
+      - XDEBUG_PORT=${XDEBUG_PORT}
 
   db:
     build:
