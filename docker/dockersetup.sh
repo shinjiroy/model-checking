@@ -8,14 +8,6 @@ if [ ! -e './backend/.env' ]; then
     cp .env.base ./backend/.env
 fi
 
-if [ ! -e './frontend/.env' ]; then
-    cp .env.base ./frontend/.env
-fi
-
 if [ ! -e './backend/.devcontainer/devcontainer.json' ]; then
     cp ./backend/.devcontainer/devcontainer.json.base ./backend/.devcontainer/devcontainer.json
-fi
-
-if [ ! -e './frontend/.devcontainer/devcontainer.json' ]; then
-    cp ./frontend/.devcontainer/devcontainer.json.base ./frontend/.devcontainer/devcontainer.json
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /var/www/${FRAMEWORK_DIR_NAME}/
+cd /var/www/framework/
 
 echo プロジェクトの初期設定を開始します。
 

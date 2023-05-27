@@ -1,20 +1,6 @@
 version: "3"
 services:
 
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        - NODEJS_VERSION=${NODEJS_VERSION}
-        - DEV_USER_UID=${LOCAL_USER_UID}
-        - DEV_USER_GID=${LOCAL_USER_GID}
-    ports:
-      - ${FRONTEND_PORT}:80
-    volumes:
-      - ${SRC_PATH}:/var/www
-      - ./logs/apache:/var/log/apache2
-    working_dir: /var/www
-
   backend:
     build:
       context: ./backend
@@ -25,7 +11,7 @@ services:
     ports:
       - ${BACKEND_PORT}:80
     volumes:
-      - ${SRC_PATH}:/var/www
+      - ../src:/var/www
       - ./logs/php:/var/log/php
       - ./logs/apache:/var/log/apache2
     working_dir: /var/www
@@ -38,7 +24,6 @@ services:
       - DB_DATABASE=${DB_NAME}
       - DB_USERNAME=${DB_USER}
       - DB_PASSWORD=${DB_PASS}
-      - FRAMEWORK_DIR_NAME=${FRAMEWORK_DIR_NAME}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=null
