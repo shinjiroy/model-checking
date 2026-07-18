@@ -1,5 +1,0 @@
-.env
-docker/logs/apache/access_log
-docker/logs/apache/error_log
-docker/logs/apache/error.log
-docker/logs/apache/other_vhosts_access.log
