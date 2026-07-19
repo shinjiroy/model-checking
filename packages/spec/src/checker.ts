@@ -1,5 +1,5 @@
 import { canonicalKey } from "./canonical.js";
-import type { Spec } from "./spec.js";
+import type { ChannelDef, Spec } from "./spec.js";
 
 export type Violation = { kind: "invariant"; name: string } | { kind: "deadlock" };
 
@@ -16,7 +16,14 @@ export type TraceStep<S> = {
 
 export type CheckResult<S> =
   | { ok: true; statesExplored: number; complete: boolean }
-  | { ok: false; violation: Violation; trace: TraceStep<S>[]; statesExplored: number };
+  | {
+      ok: false;
+      violation: Violation;
+      trace: TraceStep<S>[];
+      statesExplored: number;
+      /** 仕様のchannelsメタデータの写し(可視化のメッセージ矢印描画で使う)。channels未指定ならundefined */
+      channels?: Record<string, ChannelDef>;
+    };
 
 export type CheckOptions = {
   /** 探索する状態数の上限。超えた場合はcomplete: falseで打ち切る */
@@ -46,6 +53,7 @@ export function check<S>(spec: Spec<S>, options: CheckOptions = {}): CheckResult
   const maxStates = options.maxStates ?? 1_000_000;
   const accepting = spec.accepting ?? (() => false);
   const invariants = Object.entries(spec.invariants ?? {});
+  const channels = spec.channels;
 
   const init = deepFreeze(spec.init);
   const visited = new Set<string>([canonicalKey(init)]);
@@ -58,6 +66,7 @@ export function check<S>(spec: Spec<S>, options: CheckOptions = {}): CheckResult
       violation: { kind: "invariant", name: initViolation },
       trace: buildTrace(root),
       statesExplored: visited.size,
+      ...(channels && { channels }),
     };
   }
 
@@ -87,6 +96,7 @@ export function check<S>(spec: Spec<S>, options: CheckOptions = {}): CheckResult
             violation: { kind: "invariant", name: violated },
             trace: buildTrace(next),
             statesExplored: visited.size + 1,
+            ...(channels && { channels }),
           };
         }
 
@@ -108,6 +118,7 @@ export function check<S>(spec: Spec<S>, options: CheckOptions = {}): CheckResult
         violation: { kind: "deadlock" },
         trace: buildTrace(node),
         statesExplored: visited.size,
+        ...(channels && { channels }),
       };
     }
   }

@@ -18,6 +18,12 @@ describe("決済リトライによる二重課金(フェーズ2題材: 複数プ
     for (const step of result.trace.slice(1)) {
       expect(["client", "server"]).toContain(step.actor);
     }
+
+    // 仕様のchannelsメタデータがCheckResultへ写されている(メッセージ矢印描画の入力になる)
+    expect(result.channels).toEqual({
+      inFlight: { from: "client", to: "server" },
+      responses: { from: "server", to: "client" },
+    });
   });
 
   test("サーバーを冪等にすると反例が消え、全経路が正常終了する", () => {

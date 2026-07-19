@@ -85,4 +85,10 @@ export const paymentRetrySpec = defineSpec<State>({
   // 全メッセージを処理しきって確定していれば正常終了
   accepting: s =>
     s.clientPhase === "confirmed" && s.inFlight.length === 0 && s.responses.length === 0,
+
+  // メッセージ矢印付きシーケンス図の可視化用メタデータ(検査結果には影響しない)
+  channels: {
+    inFlight: { from: "client", to: "server" },
+    responses: { from: "server", to: "client" },
+  },
 });
