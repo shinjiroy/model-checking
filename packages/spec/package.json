@@ -3,12 +3,36 @@
   "version": "0.1.0",
   "type": "module",
   "description": "モデル検査DSL(状態・アクション・不変条件の定義)とBFSによる明示的状態探索器",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shinjiroy/model-checking.git",
+    "directory": "packages/spec"
+  },
+  "homepage": "https://github.com/shinjiroy/model-checking#readme",
+  "keywords": ["model-checking", "formal-methods", "specification", "typescript", "dsl"],
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "@model-checking/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
+    "prepack": "npm run build",
     "bench": "vite-node bench/scaleBenchmark.ts",
     "bench:enum": "vite-node bench/enumerationScaleBenchmark.ts"
   }

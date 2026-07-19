@@ -24,6 +24,11 @@ jobs:
       - name: 型チェック
         run: npm run typecheck
 
+      # @model-checking/spec の配布物が利用者側で解決できるかを、
+      # 固めて雛形にインストールして確かめる(ワークスペースのリンク越しでは検証できない)
+      - name: 配布物の検証
+        run: ./scripts/verify-package.sh
+
       # 配信物が壊れていないことをPRの時点で確かめる(デプロイと同じサブパス条件で組む)
       - name: ビルド
         run: npm run -w @model-checking/web build

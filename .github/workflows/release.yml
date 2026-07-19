@@ -1,0 +1,45 @@
+name: Release
+
+# @model-checking/spec を npm へ公開する。
+# packages/spec/package.json の version を上げ、`spec-v<version>` タグを打つと動く。
+#   npm version --workspace @model-checking/spec patch
+#   git tag spec-v0.1.1 && git push origin spec-v0.1.1
+#
+# 事前にリポジトリのSecretに NPM_TOKEN(publish権限のあるAutomationトークン)が要る。
+on:
+  push:
+    tags: ["spec-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # npmのprovenance(公開物とビルド元の紐付け)に要る
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - name: テスト
+        run: npm test
+
+      - name: 型チェック
+        run: npm run typecheck
+
+      # 配布物が利用者側で解決できることを、固めて入れて確かめてから公開する
+      - name: 配布物の検証
+        run: ./scripts/verify-package.sh
+
+      - name: 公開
+        run: npm publish --workspace @model-checking/spec --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

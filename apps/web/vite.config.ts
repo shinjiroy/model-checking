@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vite";
+import { defaultClientConditions, defaultServerConditions, defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 const monorepoRoot = fileURLToPath(new URL("../..", import.meta.url));
@@ -11,6 +11,17 @@ export default defineConfig({
   // wasm・Worker・アセットはすべて `?url` / Viteのアセット解決経由なので、
   // base を変えるだけで参照先が追随する。
   base: process.env.BASE_PATH ?? "/",
+  resolve: {
+    // モノレポ内では @model-checking/spec をビルド済みdistではなくソースで解決する
+    // (packages/spec/package.json の exports のカスタム条件)。
+    // node環境で走るテスト(vitest)のためにサーバー側の解決条件にも同じものを足す
+    conditions: ["@model-checking/source", ...defaultClientConditions],
+  },
+  ssr: {
+    resolve: {
+      conditions: ["@model-checking/source", ...defaultServerConditions],
+    },
+  },
   plugins: [react()],
   server: {
     host: "0.0.0.0",
