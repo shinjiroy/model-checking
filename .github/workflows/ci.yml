@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: テスト
+        run: npm test
+
+      - name: 型チェック
+        run: npm run typecheck
+
+      # 配信物が壊れていないことをPRの時点で確かめる(デプロイと同じサブパス条件で組む)
+      - name: ビルド
+        run: npm run -w @model-checking/web build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/

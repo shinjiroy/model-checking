@@ -7,6 +7,27 @@ services:
     build: .
     command: npm run typecheck
 
+  # 配信物をローカルで作る。BASE_PATH は配信元のサブパスに合わせる
+  # (例: BASE_PATH=/model-checking/ docker compose run --rm build)
+  build:
+    build: .
+    command: npm run --workspace=@model-checking/web build
+    environment:
+      BASE_PATH: ${BASE_PATH:-/}
+    volumes:
+      - ./apps/web/dist:/app/apps/web/dist
+
+  # 作った配信物を静的配信して動作確認する(http://localhost:4173)
+  preview:
+    build: .
+    command: npm run --workspace=@model-checking/web preview -- --host 0.0.0.0 --port 4173
+    environment:
+      BASE_PATH: ${BASE_PATH:-/}
+    ports:
+      - "4173:4173"
+    volumes:
+      - ./apps/web/dist:/app/apps/web/dist
+
   web:
     build: .
     command: npm run dev --workspace=@model-checking/web -- --host 0.0.0.0 --port 5173

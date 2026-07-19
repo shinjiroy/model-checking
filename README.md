@@ -44,4 +44,8 @@ docker compose run --rm test
 docker compose run --rm typecheck
 ```
 
+## デプロイ
+
+mainへのpushで GitHub Pages へ自動配信される(テスト・型チェックを通してからビルドする)。仕様はブラウザ内で処理され外部に送信されない。配信構成・サブパス対応・送信経路がないことの確認は [docs/deployment.md](docs/deployment.md) を参照。
+
 検査器のトレース形式(`CheckResult`/`TraceStep`)は可視化との契約であり、変更時は [docs/dsl-sketch.md](docs/dsl-sketch.md) と [docs/trace-visualization.md](docs/trace-visualization.md) を同時に更新すること。
