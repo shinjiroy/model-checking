@@ -285,6 +285,77 @@ function loaderFor(path: string): string {
   return "ts";
 }
 
+/**
+ * entryから相対import/exportを辿って到達可能なユーザーファイルのキー集合を返す。
+ *
+ * バンドル(実際に実行されるコード)はentryから到達可能なファイルしか取り込まないため、
+ * 到達不能なファイル(ワークスペースにあるだけで一度もimportされないファイル)は
+ * 共有ペイロードから除いても復元後の挙動は変わらない — 共有URLを短くするために使う。
+ *
+ * entryがfiles内に解決できない場合は空集合を返す(呼び出し側で「絞り込めなかった」と判断できる)。
+ */
+export function collectReachableUserFiles(files: Record<string, string>, entry: string): Set<string> {
+  const reachable = new Set<string>();
+  const start = resolveUserPath("", entry, files);
+  if (start.kind !== "found") return reachable;
+
+  const queue = [start.path];
+  while (queue.length > 0) {
+    const current = queue.pop() as string;
+    if (reachable.has(current)) continue;
+    reachable.add(current);
+
+    const source = files[current];
+    if (source === undefined) continue;
+    for (const specifier of extractRelativeSpecifiers(source)) {
+      const resolved = resolveUserPath(current, specifier, files);
+      if (resolved.kind === "found" && !reachable.has(resolved.path)) {
+        queue.push(resolved.path);
+      }
+    }
+  }
+  return reachable;
+}
+
+/**
+ * ソースコードから相対パス(`.`/`..`始まり)のモジュール指定子を抜き出す。
+ * import/export文・動的import()・require()を対象にする。バンドラの解決ロジックと同じく
+ * ここで拾えなかったimportは共有時に取りこぼしになるため、実在するESM構文は広めに拾う。
+ */
+function extractRelativeSpecifiers(source: string): string[] {
+  const specifiers: string[] = [];
+  // import ... from "x" / export ... from "x" / import "x"(副作用import)
+  const fromRe = /(?:\bimport\b|\bexport\b)[\s\S]*?\bfrom\s*['"]([^'"]+)['"]/g;
+  const sideEffectRe = /\bimport\s*['"]([^'"]+)['"]/g;
+  // 動的 import("x") / require("x")
+  const callRe = /\b(?:import|require)\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  for (const re of [fromRe, sideEffectRe, callRe]) {
+    for (let m = re.exec(source); m !== null; m = re.exec(source)) {
+      const specifier = m[1];
+      if (specifier && (specifier.startsWith(".") || specifier.startsWith("/"))) specifiers.push(specifier);
+    }
+  }
+  return specifiers;
+}
+
+/**
+ * filesのうちentryから到達可能なものだけに絞った新しいオブジェクトを返す(共有URL短縮用)。
+ * entryを解決できないなど到達集合が空になる場合は、データを失わないよう元のfilesをそのまま返す。
+ */
+export function pruneUnreachableFiles(
+  files: Record<string, string>,
+  entry: string,
+): Record<string, string> {
+  const reachable = collectReachableUserFiles(files, entry);
+  if (reachable.size === 0) return files;
+
+  const pruned: Record<string, string> = {};
+  for (const [path, contents] of Object.entries(files)) {
+    if (reachable.has(path)) pruned[path] = contents;
+  }
+  return pruned;
+}
+
 /** resolveUserPathの結果。escapedは `../` で仕様フォルダのルートより上へ出ようとしたことを表す */
 type ResolveOutcome = { kind: "found"; path: string } | { kind: "escaped" } | { kind: "not-found" };
 

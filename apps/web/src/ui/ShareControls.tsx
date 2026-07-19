@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { pruneUnreachableFiles } from "../core/bundle.js";
 import { buildShareUrl, encodeSharePayload, isShareUrlTooLong, type SharePayload } from "../core/share.js";
 
 type Props = {
@@ -19,7 +20,9 @@ export function ShareControls({ files, entry, specName, maxStates }: Props) {
     setCopyStatus("idle");
     setCreateError(null);
     try {
-      const payload: SharePayload = { version: 1, files, entry, maxStates };
+      // entryから到達不能なファイルはバンドルに含まれず復元後の挙動に影響しないため、
+      // 共有URLを短くするために除外する
+      const payload: SharePayload = { version: 1, files: pruneUnreachableFiles(files, entry), entry, maxStates };
       if (specName) payload.specName = specName;
 
       const encoded = await encodeSharePayload(payload);
@@ -45,7 +48,7 @@ export function ShareControls({ files, entry, specName, maxStates }: Props) {
   return (
     <section>
       <h2>共有</h2>
-      <p>現在読み込んでいる仕様ファイル全体をURLに埋め込みます(サーバーへは送信されません)。</p>
+      <p>エントリから参照されている仕様ファイルをURLに埋め込みます(サーバーへは送信されません)。</p>
       <button type="button" onClick={() => void handleCreate()} disabled={busy}>
         {busy ? "作成中…" : "共有URLを作成"}
       </button>
