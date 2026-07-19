@@ -9,6 +9,7 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "bench": "vite-node bench/scaleBenchmark.ts"
+    "bench": "vite-node bench/scaleBenchmark.ts",
+    "bench:enum": "vite-node bench/enumerationScaleBenchmark.ts"
   }
 }
