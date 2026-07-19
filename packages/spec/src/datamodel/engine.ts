@@ -6,7 +6,7 @@
  * 将来のZ3ベースエンジンを、モデル定義(Formula/ModelDef)を書き換えずに差し替えられるようにする
  * (docs/datamodel-sketch.md参照)。
  */
-import type { Formula, Term } from "./formula.js";
+import type { Formula, IntExpr, Term } from "./formula.js";
 import type { ModelDef } from "./model.js";
 
 /** 検査対象の1インスタンス(小スコープの世界の1つの解釈) */
@@ -65,6 +65,26 @@ function evalTerm(term: Term, env: Env): string {
   return value;
 }
 
+/** 整数式(IntExpr)を評価する。card/countは有限個の原子・タプルに対するite総和に相当する */
+function evalIntExpr(expr: IntExpr, instance: Instance, env: Env): number {
+  switch (expr.kind) {
+    case "lit":
+      return expr.value;
+    case "card":
+      return (instance.relations[expr.relation] ?? []).length;
+    case "count": {
+      const atoms = instance.atoms[expr.sort] ?? [];
+      return atoms.filter((atom) => evalFormula(expr.body, instance, { ...env, [expr.varId]: atom })).length;
+    }
+    case "add":
+      return evalIntExpr(expr.left, instance, env) + evalIntExpr(expr.right, instance, env);
+    default: {
+      const exhaustive: never = expr;
+      throw new Error(`internal: 未知の整数式ノードです: ${JSON.stringify(exhaustive)}`);
+    }
+  }
+}
+
 function evalFormula(formula: Formula, instance: Instance, env: Env): boolean {
   switch (formula.kind) {
     case "forall": {
@@ -94,6 +114,10 @@ function evalFormula(formula: Formula, instance: Instance, env: Env): boolean {
       return !evalFormula(formula.left, instance, env) || evalFormula(formula.right, instance, env);
     case "iff":
       return evalFormula(formula.left, instance, env) === evalFormula(formula.right, instance, env);
+    case "lt":
+      return evalIntExpr(formula.left, instance, env) < evalIntExpr(formula.right, instance, env);
+    case "le":
+      return evalIntExpr(formula.left, instance, env) <= evalIntExpr(formula.right, instance, env);
     default: {
       const exhaustive: never = formula;
       throw new Error(`internal: 未知の式ノードです: ${JSON.stringify(exhaustive)}`);

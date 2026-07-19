@@ -22,6 +22,18 @@ export type Term = {
   sort: string;
 };
 
+/**
+ * 整数値を表す式。atom値(Term)とは型で分離しており、混同できない
+ * (例: `eq`の引数にIntExprを渡すことはできない)。
+ * Z3翻訳可能性を損なわないよう、有限領域上の線形整数算術(加算・比較・有限個のite総和)
+ * の範囲に限定している(乗算・非有界量化・実数は含めない)。
+ */
+export type IntExpr =
+  | { kind: "lit"; value: number }
+  | { kind: "card"; relation: string }
+  | { kind: "count"; sort: string; varId: number; body: Formula }
+  | { kind: "add"; left: IntExpr; right: IntExpr };
+
 export type Formula =
   | { kind: "forall"; sort: string; varId: number; body: Formula }
   | { kind: "exists"; sort: string; varId: number; body: Formula }
@@ -32,7 +44,9 @@ export type Formula =
   | { kind: "or"; operands: readonly Formula[] }
   | { kind: "not"; operand: Formula }
   | { kind: "implies"; left: Formula; right: Formula }
-  | { kind: "iff"; left: Formula; right: Formula };
+  | { kind: "iff"; left: Formula; right: Formula }
+  | { kind: "lt"; left: IntExpr; right: IntExpr }
+  | { kind: "le"; left: IntExpr; right: IntExpr };
 
 let nextVarId = 0;
 
@@ -84,4 +98,47 @@ export function implies(left: Formula, right: Formula): Formula {
 
 export function iff(left: Formula, right: Formula): Formula {
   return { kind: "iff", left, right };
+}
+
+/** 整数リテラル(非負整数を想定) */
+export function lit(value: number): IntExpr {
+  return { kind: "lit", value };
+}
+
+/** 関係のタプル数(集合の濃度): `#relation` */
+export function card(relation: string): IntExpr {
+  return { kind: "card", relation };
+}
+
+/** 集合内包の濃度: `#{ x: sort | body(x) }`。bodyを満たす原子の数 */
+export function count(sort: string, body: (x: Term) => Formula): IntExpr {
+  const x = freshVar(sort);
+  return { kind: "count", sort, varId: x.id, body: body(x) };
+}
+
+/** 加算(`+`)。可変長引数はleft-foldで畳み込む */
+export function add(first: IntExpr, second: IntExpr, ...rest: IntExpr[]): IntExpr {
+  return rest.reduce<IntExpr>((acc, next) => ({ kind: "add", left: acc, right: next }), {
+    kind: "add",
+    left: first,
+    right: second,
+  });
+}
+
+export function lt(left: IntExpr, right: IntExpr): Formula {
+  return { kind: "lt", left, right };
+}
+
+export function le(left: IntExpr, right: IntExpr): Formula {
+  return { kind: "le", left, right };
+}
+
+/** `left > right` の糖衣構文(`right < left`) */
+export function gt(left: IntExpr, right: IntExpr): Formula {
+  return lt(right, left);
+}
+
+/** `left >= right` の糖衣構文(`right <= left`) */
+export function ge(left: IntExpr, right: IntExpr): Formula {
+  return le(right, left);
 }

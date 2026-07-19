@@ -6,7 +6,7 @@
  * (漏出Term。ある forall/exists のコールバックで受け取った変数を、別の量化子のbodyへ
  * 埋め込んでしまった場合など)もここで日本語エラーとして投げる。
  */
-import type { Formula, Term } from "./formula.js";
+import type { Formula, IntExpr, Term } from "./formula.js";
 
 export type ModelDef = {
   /** 有限スコープで列挙する集合(例: "User", "Doc") */
@@ -89,9 +89,40 @@ function validateFormula(def: ModelDef, formula: Formula, path: string, bound: B
       validateFormula(def, formula.left, `${path}.${formula.kind}.left`, bound);
       validateFormula(def, formula.right, `${path}.${formula.kind}.right`, bound);
       return;
+    case "lt":
+    case "le":
+      validateIntExpr(def, formula.left, `${path}.${formula.kind}.left`, bound);
+      validateIntExpr(def, formula.right, `${path}.${formula.kind}.right`, bound);
+      return;
     default: {
       const exhaustive: never = formula;
       throw new Error(`${path}: 未知の式ノードです: ${JSON.stringify(exhaustive)}`);
+    }
+  }
+}
+
+function validateIntExpr(def: ModelDef, expr: IntExpr, path: string, bound: BoundVars): void {
+  switch (expr.kind) {
+    case "lit":
+      return;
+    case "card":
+      if (!def.relations[expr.relation]) {
+        throw new Error(`${path}: 未知の関係です: ${expr.relation}(relationsに宣言されていません)`);
+      }
+      return;
+    case "count":
+      if (!def.sorts.includes(expr.sort)) {
+        throw new Error(`${path}: 未知のソートです: ${expr.sort}(sortsに宣言されていません)`);
+      }
+      validateFormula(def, expr.body, `${path}.count(${expr.sort})`, new Set([...bound, expr.varId]));
+      return;
+    case "add":
+      validateIntExpr(def, expr.left, `${path}.add.left`, bound);
+      validateIntExpr(def, expr.right, `${path}.add.right`, bound);
+      return;
+    default: {
+      const exhaustive: never = expr;
+      throw new Error(`${path}: 未知の整数式ノードです: ${JSON.stringify(exhaustive)}`);
     }
   }
 }
