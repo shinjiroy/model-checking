@@ -51,7 +51,7 @@ type Node<S> = {
  */
 export function check<S>(spec: Spec<S>, options: CheckOptions = {}): CheckResult<S> {
   const maxStates = options.maxStates ?? 1_000_000;
-  const accepting = spec.accepting ?? (() => false);
+  const done = spec.done ?? (() => false);
   const invariants = Object.entries(spec.invariants ?? {});
   const channels = spec.channels;
 
@@ -112,7 +112,7 @@ export function check<S>(spec: Spec<S>, options: CheckOptions = {}): CheckResult
       }
     }
 
-    if (!enabled && !accepting(node.state)) {
+    if (!enabled && !done(node.state)) {
       return {
         ok: false,
         violation: { kind: "deadlock" },

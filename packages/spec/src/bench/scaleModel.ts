@@ -53,8 +53,8 @@ export function createScaleModel({ base, dimensions }: ScaleModelParams): Spec<S
     },
     // 全カウンタが上限に達した状態が唯一のデッドロック(=正常終了)状態。
     // このモデルの目的は探索性能の測定であり、デッドロック判定そのものは対象外なので、
-    // 常にacceptingとして探索を最後まで完走させる。
-    accepting: () => true,
+    // 常にdoneとして探索を最後まで完走させる。
+    done: () => true,
   });
 }
 

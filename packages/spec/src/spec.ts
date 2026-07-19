@@ -27,7 +27,7 @@ export type Spec<S> = {
   actions: Record<string, ActionDef<S, any>>;
   invariants?: Record<string, (state: S) => boolean>;
   /** 発火可能なアクションがなくても正常終了とみなす状態(デッドロック判定から除外) */
-  accepting?: (state: S) => boolean;
+  done?: (state: S) => boolean;
   /**
    * 状態のどの配列フィールドがどの方向のチャネルかを示す可視化用メタデータ(検査には無関係)。
    * キーは状態のフィールド名、値はそのチャネルの送信元actor(from)・宛先actor(to)。
