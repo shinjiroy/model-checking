@@ -16,7 +16,7 @@ npmワークスペースのモノレポ。
 ## 使い方(SPA)
 
 ```bash
-docker compose up web    # http://localhost:5173
+docker compose up -d web    # http://localhost:5173
 # または
 npm install && npm run -w @model-checking/web dev
 ```
