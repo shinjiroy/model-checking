@@ -5,7 +5,8 @@
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
     "test": "npm run test --workspaces --if-present",
-    "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present"
+    "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
+    "bench": "npm run bench -w @model-checking/spec --"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
