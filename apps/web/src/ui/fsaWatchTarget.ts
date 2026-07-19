@@ -28,11 +28,12 @@ async function collect(dir: FileSystemDirectoryHandle, prefix: string, out: Watc
       continue;
     }
     if (!isTsFile(name)) continue;
-    // eslint-disable-next-line no-await-in-loop -- lastModifiedを得るためにgetFile()が要る
+    // eslint-disable-next-line no-await-in-loop -- lastModified/sizeを得るためにgetFile()が要る
     const file = await handle.getFile();
     out.push({
       path,
       lastModified: file.lastModified,
+      size: file.size,
       read: async () => {
         // 変更検知後の実読み込み時点で改めて最新のFileを取得する(getFile()呼び出し後に
         // ディスク上のファイルが変わっても、そのFileオブジェクト自体は当時のスナップショットのため)

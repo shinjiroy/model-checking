@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { diffWatchSnapshot, pollWatchTarget, toSnapshot, type WatchFile, type WatchTarget } from "../src/core/watch.js";
 
 function file(path: string, lastModified: number, content: string): WatchFile {
-  return { path, lastModified, read: async () => content };
+  return { path, lastModified, size: content.length, read: async () => content };
 }
 
 function fakeTarget(files: WatchFile[]): WatchTarget {
@@ -29,9 +29,16 @@ describe("toSnapshot / diffWatchSnapshot", () => {
     expect(changes).toHaveLength(3);
   });
 
-  test("lastModifiedが同じなら内容が違っていてもchangedにしない(判定基準はlastModifiedのみ)", () => {
+  test("lastModifiedが同じでもサイズが変われば内容変更として検出する", () => {
     const prev = toSnapshot([file("a.ts", 100, "old")]);
-    const next = toSnapshot([file("a.ts", 100, "old")]);
+    const next = toSnapshot([file("a.ts", 100, "old-and-longer")]);
+    expect(diffWatchSnapshot(prev, next)).toEqual([{ kind: "changed", path: "a.ts" }]);
+  });
+
+  test("lastModifiedもサイズも同じなら変化なしとみなす(残存する既知の制約)", () => {
+    // mtimeを保持しつつ同じバイト数だけを書き換えるケースは、内容ハッシュを取らない限り検知できない
+    const prev = toSnapshot([file("a.ts", 100, "abc")]);
+    const next = toSnapshot([file("a.ts", 100, "xyz")]);
     expect(diffWatchSnapshot(prev, next)).toEqual([]);
   });
 });
@@ -41,7 +48,7 @@ describe("pollWatchTarget", () => {
     let readCount = 0;
     const target: WatchTarget = {
       listFiles: async () => [
-        { path: "a.ts", lastModified: 1, read: async () => { readCount++; return "a"; } },
+        { path: "a.ts", lastModified: 1, size: 1, read: async () => { readCount++; return "a"; } },
       ],
     };
     const snapshot = toSnapshot(await target.listFiles());
@@ -54,19 +61,19 @@ describe("pollWatchTarget", () => {
 
   test("変化があれば全ファイルを読み込んで返す", async () => {
     const target = fakeTarget([file("a.ts", 2, "a-new"), file("b.ts", 1, "b")]);
-    const prevSnapshot = { "a.ts": 1, "b.ts": 1 };
+    const prevSnapshot = { "a.ts": "1:5", "b.ts": "1:1" };
 
     const result = await pollWatchTarget(target, prevSnapshot);
     expect(result.changed).toBe(true);
     if (!result.changed) return;
     expect(result.files).toEqual({ "a.ts": "a-new", "b.ts": "b" });
-    expect(result.snapshot).toEqual({ "a.ts": 2, "b.ts": 1 });
+    expect(result.snapshot).toEqual({ "a.ts": "2:5", "b.ts": "1:1" });
     expect(result.changes).toEqual([{ kind: "changed", path: "a.ts" }]);
   });
 
   test("ファイルが削除されたことも変化として検出し、残りのファイルだけを返す", async () => {
     const target = fakeTarget([file("a.ts", 1, "a")]);
-    const prevSnapshot = { "a.ts": 1, "b.ts": 1 };
+    const prevSnapshot = { "a.ts": "1:1", "b.ts": "1:1" };
 
     const result = await pollWatchTarget(target, prevSnapshot);
     expect(result.changed).toBe(true);
@@ -77,7 +84,7 @@ describe("pollWatchTarget", () => {
 
   test("新規ファイルが追加された場合も検出する", async () => {
     const target = fakeTarget([file("a.ts", 1, "a"), file("new.ts", 5, "new-content")]);
-    const prevSnapshot = { "a.ts": 1 };
+    const prevSnapshot = { "a.ts": "1:1" };
 
     const result = await pollWatchTarget(target, prevSnapshot);
     expect(result.changed).toBe(true);
