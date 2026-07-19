@@ -1,5 +1,26 @@
 import { describe, expect, test } from "vitest";
-import { defineModel, forall, exists, rel, eq, neq, and, or, not, implies, iff, type Term } from "../src/index.js";
+import {
+  defineModel,
+  forall,
+  exists,
+  rel,
+  eq,
+  neq,
+  and,
+  or,
+  not,
+  implies,
+  iff,
+  lit,
+  card,
+  count,
+  add,
+  lt,
+  le,
+  gt,
+  ge,
+  type Term,
+} from "../src/index.js";
 
 const baseModel = {
   sorts: ["User", "Doc"],
@@ -52,6 +73,43 @@ describe("defineModel: 正常系", () => {
       },
     });
     expect(model.assertions.crossReference).toBeDefined();
+  });
+});
+
+describe("defineModel: 算術・集合濃度の式木も構築できる", () => {
+  test("card(relation)を使った濃度制約(各Docのオーナーは高々1人)を構築できる", () => {
+    const model = defineModel({
+      ...baseModel,
+      assertions: {
+        // ドキュメントごとにオーナーは高々1人、という濃度制約をcardで表現する
+        atMostOneOwnerPerDoc: forall("Doc", () => le(card("owner"), lit(1))),
+      },
+    });
+    expect(model.assertions.atMostOneOwnerPerDoc).toBeDefined();
+  });
+
+  test("countによる集合内包の濃度制約(管理者は2人以下)を構築できる", () => {
+    const model = defineModel({
+      ...baseModel,
+      assertions: {
+        atMostTwoAdmins: le(count("User", u => rel("admin", u)), lit(2)),
+      },
+    });
+    expect(model.assertions.atMostTwoAdmins).toBeDefined();
+  });
+
+  test("add(可変長)・lt・gt・geを組み合わせて構築できる", () => {
+    const model = defineModel({
+      ...baseModel,
+      assertions: {
+        mixed: and(
+          lt(add(lit(1), lit(2), lit(3)), card("owner")),
+          gt(lit(5), lit(1)),
+          ge(lit(1), lit(1)),
+        ),
+      },
+    });
+    expect(model.assertions.mixed).toBeDefined();
   });
 });
 
@@ -154,6 +212,56 @@ describe("defineModel: バリデーションエラー", () => {
     forall("User", u => {
       capturedUser = u;
       return rel("admin", u); // この式自体は捨てる(検証はしない)
+    });
+
+    expect(() =>
+      defineModel({
+        ...baseModel,
+        assertions: {
+          bad: forall("Doc", d => rel("owner", capturedUser!, d)),
+        },
+      }),
+    ).toThrow(/量化子の外に持ち出した変数/);
+  });
+
+  test("cardで未知の関係を参照するとエラー", () => {
+    expect(() =>
+      defineModel({
+        ...baseModel,
+        assertions: {
+          bad: le(card("nonExistent"), lit(1)),
+        },
+      }),
+    ).toThrow(/未知の関係です: nonExistent/);
+  });
+
+  test("countで未知のソートを走査するとエラー", () => {
+    expect(() =>
+      defineModel({
+        ...baseModel,
+        assertions: {
+          bad: le(count("Group", g => rel("admin", g)), lit(1)),
+        },
+      }),
+    ).toThrow(/未知のソートです: Group/);
+  });
+
+  test("count内のbodyでも通常のFormulaバリデーション(未知の関係)が働く", () => {
+    expect(() =>
+      defineModel({
+        ...baseModel,
+        assertions: {
+          bad: le(count("User", u => rel("nonExistent", u)), lit(1)),
+        },
+      }),
+    ).toThrow(/未知の関係です: nonExistent/);
+  });
+
+  test("count内で束縛した変数をcountの外へ持ち出して使うと漏出Termとして構築時エラーになる", () => {
+    let capturedUser: Term | undefined;
+    count("User", u => {
+      capturedUser = u;
+      return rel("admin", u);
     });
 
     expect(() =>
