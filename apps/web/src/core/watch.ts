@@ -7,10 +7,15 @@
  * ポーリングのタイマー(setInterval)自体はUI層(ui/useDirectoryWatch.ts)の責務とする。
  */
 
-/** 監視対象の1ファイル。lastModifiedの比較だけで変更検知し、内容はreadで遅延取得する */
+/**
+ * 監視対象の1ファイル。lastModifiedとsizeの組で変更検知し、内容はreadで遅延取得する。
+ * sizeはgetFile()がlastModifiedと同時に返すため追加の読み込みコストなしで得られ、
+ * 「同一msでの保存」や「mtimeを保持するエディタ」でもサイズが変われば検知できる。
+ */
 export type WatchFile = {
   path: string;
   lastModified: number;
+  size: number;
   read: () => Promise<string>;
 };
 
@@ -19,17 +24,22 @@ export type WatchTarget = {
   listFiles: () => Promise<WatchFile[]>;
 };
 
-/** path → lastModified のスナップショット */
-export type WatchSnapshot = Record<string, number>;
+/** path → `${lastModified}:${size}` の署名のスナップショット */
+export type WatchSnapshot = Record<string, string>;
 
 export type WatchChange =
   | { kind: "added"; path: string }
   | { kind: "changed"; path: string }
   | { kind: "removed"; path: string };
 
+/** 1ファイルの変更検知用の署名。lastModifiedとsizeの両方が一致したときだけ「変化なし」とみなす */
+export function fileSignature(file: WatchFile): string {
+  return `${file.lastModified}:${file.size}`;
+}
+
 export function toSnapshot(files: WatchFile[]): WatchSnapshot {
   const snapshot: WatchSnapshot = {};
-  for (const file of files) snapshot[file.path] = file.lastModified;
+  for (const file of files) snapshot[file.path] = fileSignature(file);
   return snapshot;
 }
 

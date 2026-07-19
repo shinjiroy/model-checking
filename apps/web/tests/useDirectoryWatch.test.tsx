@@ -30,6 +30,7 @@ function makeFakeTarget() {
       return [...files.entries()].map(([path, f]) => ({
         path,
         lastModified: f.mtime,
+        size: f.content.length,
         read: async () => files.get(path)!.content,
       }));
     },
