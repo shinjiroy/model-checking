@@ -117,7 +117,7 @@ describe("bundleSpec: @model-checking/spec のエイリアス解決", () => {
           const spec = defineSpec({
             init: { n: 0 },
             actions: { inc: { when: (s: { n: number }) => s.n < 2, then: (s: { n: number }) => ({ ...s, n: s.n + 1 }) } },
-            accepting: () => true,
+            done: () => true,
           });
           export const result = check(spec);
         `,

@@ -47,13 +47,13 @@ describe("注文キャンセルと決済Webhookの競合(題材の仕様)", () =
 });
 
 describe("デッドロック検出", () => {
-  const counter = (accepting?: (s: { n: number }) => boolean) =>
+  const counter = (done?: (s: { n: number }) => boolean) =>
     defineSpec<{ n: number }>({
       init: { n: 0 },
       actions: {
         inc: { when: s => s.n < 2, then: s => ({ n: s.n + 1 }) },
       },
-      accepting,
+      done,
     });
 
   test("発火可能なアクションがない状態をデッドロックとして報告する", () => {
@@ -65,7 +65,7 @@ describe("デッドロック検出", () => {
     expect(result.trace.at(-1)!.state).toEqual({ n: 2 });
   });
 
-  test("acceptingが真の状態はデッドロックとみなさない", () => {
+  test("doneが真の状態はデッドロックとみなさない", () => {
     const result = check(counter(s => s.n === 2));
     expect(result.ok).toBe(true);
   });
@@ -85,7 +85,7 @@ describe("パラメータ付き非決定性", () => {
       invariants: {
         bobNeverApproves: s => s.approver !== "bob",
       },
-      accepting: s => s.approver !== null,
+      done: s => s.approver !== null,
     });
 
     const result = check(spec);
@@ -109,7 +109,7 @@ describe("状態の重複排除", () => {
         setA: { when: s => !s.a, then: s => ({ ...s, a: true }) },
         setB: { when: s => !s.b, then: s => ({ ...s, b: true }) },
       },
-      accepting: () => true,
+      done: () => true,
     });
 
     const result = check(spec);
@@ -139,7 +139,7 @@ describe("検査結果の付帯情報", () => {
       actions: {
         inc: { when: s => s.n < 100, then: s => ({ n: s.n + 1 }) },
       },
-      accepting: () => true,
+      done: () => true,
     });
 
     const result = check(spec, { maxStates: 10 });
@@ -152,7 +152,7 @@ describe("検査結果の付帯情報", () => {
       actions: {
         inc: { when: s => s.n < 3000, then: s => ({ n: s.n + 1 }) },
       },
-      accepting: () => true,
+      done: () => true,
     });
 
     const progress: number[] = [];
@@ -215,7 +215,7 @@ describe("仕様側の誤りの検出", () => {
           },
         },
       },
-      accepting: () => true,
+      done: () => true,
     });
 
     expect(() => check(spec)).toThrow(TypeError);
@@ -225,7 +225,7 @@ describe("仕様側の誤りの検出", () => {
     const spec = defineSpec<{ at: unknown }>({
       init: { at: new Date(0) },
       actions: {},
-      accepting: () => true,
+      done: () => true,
     });
 
     expect(() => check(spec)).toThrow(/プレーンオブジェクト以外/);

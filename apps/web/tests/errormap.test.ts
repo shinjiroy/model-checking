@@ -24,7 +24,7 @@ describe("受け入れ基準2の裏付け: 実行時エラーの位置特定", (
       const spec = defineSpec({
         init: { m: new Map() },
         actions: { noop: { then: (s: unknown) => s } },
-        accepting: () => true,
+        done: () => true,
       });
 
       export const result = check(spec);
@@ -60,7 +60,7 @@ describe("受け入れ基準2の裏付け: 実行時エラーの位置特定", (
             },
           },
         },
-        accepting: () => true,
+        done: () => true,
       });
 
       export const result = check(spec);

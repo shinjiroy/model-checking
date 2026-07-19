@@ -60,5 +60,5 @@ export const orderPaymentSpec = defineSpec<State>({
   },
 
   // Webhookを処理しきっていれば、発火可能なアクションがなくても正常終了
-  accepting: s => s.webhooks.length === 0,
+  done: s => s.webhooks.length === 0,
 });
