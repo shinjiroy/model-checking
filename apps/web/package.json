@@ -1,0 +1,27 @@
+{
+  "name": "@model-checking/web",
+  "private": true,
+  "type": "module",
+  "description": "モデル検査DSLのブラウザ完結型SPA(esbuild-wasmバンドル→Web Workerで検査)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@model-checking/spec": "^0.1.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "esbuild": "0.28.1",
+    "esbuild-wasm": "0.28.1",
+    "source-map-js": "^1.2.1",
+    "vite": "^8.1.5"
+  }
+}
