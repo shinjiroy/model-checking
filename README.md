@@ -10,7 +10,7 @@ npmワークスペースのモノレポ。
 | --- | --- |
 | [packages/spec/](packages/spec/) | 仕様記述DSL(`defineSpec`)+BFS検査器(`check`)、データモデル検証DSL(`defineModel`)+小スコープ列挙(`checkModel`)。ブラウザ非依存 |
 | [apps/web/](apps/web/) | SPA。仕様ファイルをesbuild-wasmでブラウザ内バンドルし、Worker上で検査、反例をactorレーンのタイムライン+状態diff(状態機械)またはインスタンスの表(データモデル)で可視化 |
-| [examples/](examples/) | デモ仕様兼回帰テスト(order-payment、payment-retry、doc-permission、conduit-favorite-count、conduit-comment-delete) |
+| [examples/](examples/) | デモ仕様兼回帰テスト(tutorial-withdraw、order-payment、payment-retry、doc-permission、conduit-favorite-count、conduit-comment-delete) |
 | [docs/](docs/) | DSL・トレース形式・可視化の設計判断 |
 
 ## 使い方(SPA)
@@ -21,13 +21,13 @@ docker compose up -d web    # http://localhost:5173
 npm install && npm run -w @model-checking/web dev
 ```
 
-1. 仕様ファイル(.ts)をドラッグ&ドロップするか、ワンクリックデモ(payment-retry / order-payment / doc-permission / conduit-favorite-count / conduit-comment-delete)を読み込む
+1. 仕様ファイル(.ts)をドラッグ&ドロップするか、ワンクリックデモ(tutorial-withdraw / payment-retry / order-payment / doc-permission / conduit-favorite-count / conduit-comment-delete)を読み込む
 2. 「解析する」→「検査する」。検査中は探索済み状態数が表示され、キャンセルできる
 3. 状態機械(`defineSpec`)で不変条件違反・デッドロックが見つかると、反例トレースをactorレーンのタイムラインで表示。ステップを選ぶと直前状態との差分が見える。データモデル(`defineModel`)でassertionの破れが見つかると、反例インスタンス(ソートの原子と関係のタプル)を表で表示
 4. 「共有URLを作成」で仕様ソース全体を圧縮してURLフラグメントに埋め込み、レビューで共有できる(サーバーへは送信されない)
 5. Chrome/Edge系では「フォルダを開いて監視」で保存→自動再検査のウォッチモードが使える(他ブラウザはドラッグ&ドロップ)。ウォッチモードの手動動作確認手順は [docs/watch-mode-verification.md](docs/watch-mode-verification.md) を参照
 
-仕様の書き方は [docs/dsl-sketch.md](docs/dsl-sketch.md)(状態機械)、[docs/datamodel-sketch.md](docs/datamodel-sketch.md)(データモデル・権限)と [examples/](examples/) を参照。
+はじめての場合は [docs/tutorial.md](docs/tutorial.md) から読む(最初の1仕様を書いて検査するまで、およそ40分)。DSLの全機能は [docs/dsl-sketch.md](docs/dsl-sketch.md)(状態機械)、[docs/datamodel-sketch.md](docs/datamodel-sketch.md)(データモデル・権限)と [examples/](examples/) を参照。
 
 ## 開発
 
