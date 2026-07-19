@@ -15,6 +15,12 @@ export type ActionDef<S, P = unknown> = {
   then: (state: S, param: P) => S;
 };
 
+/** チャネル(配列フィールド)の送信元・宛先。可視化(メッセージ矢印)用メタデータで、検査結果には影響しない */
+export type ChannelDef = {
+  from: string;
+  to: string;
+};
+
 export type Spec<S> = {
   init: S;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,6 +28,12 @@ export type Spec<S> = {
   invariants?: Record<string, (state: S) => boolean>;
   /** 発火可能なアクションがなくても正常終了とみなす状態(デッドロック判定から除外) */
   accepting?: (state: S) => boolean;
+  /**
+   * 状態のどの配列フィールドがどの方向のチャネルかを示す可視化用メタデータ(検査には無関係)。
+   * キーは状態のフィールド名、値はそのチャネルの送信元actor(from)・宛先actor(to)。
+   * `actor` と同種の追加情報であり、DSLの意味論(検査結果)には一切影響しない。
+   */
+  channels?: Record<string, ChannelDef>;
 };
 
 export function defineSpec<S>(spec: Spec<S>): Spec<S> {

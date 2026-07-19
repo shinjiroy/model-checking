@@ -1,5 +1,5 @@
 export { defineSpec } from "./spec.js";
-export type { ActionDef, Spec } from "./spec.js";
+export type { ActionDef, ChannelDef, Spec } from "./spec.js";
 export { check } from "./checker.js";
 export type { CheckOptions, CheckResult, TraceStep, Violation } from "./checker.js";
 

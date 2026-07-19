@@ -169,6 +169,39 @@ describe("検査結果の付帯情報", () => {
   });
 });
 
+describe("channelsメタデータ(可視化用、検査結果には影響しない)", () => {
+  test("channels未指定ならCheckResultのchannelsはundefinedのまま", () => {
+    const spec = defineSpec<{ n: number }>({
+      init: { n: 0 },
+      actions: {
+        inc: { when: s => s.n < 1, then: s => ({ n: s.n + 1 }) },
+      },
+      invariants: { neverIncremented: s => s.n === 0 },
+    });
+
+    const result = check(spec);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.channels).toBeUndefined();
+  });
+
+  test("channelsを指定するとCheckResultへそのまま写される", () => {
+    const spec = defineSpec<{ queue: number[] }>({
+      init: { queue: [] },
+      actions: {
+        push: { when: s => s.queue.length < 1, then: s => ({ queue: [...s.queue, 1] }) },
+      },
+      invariants: { queueStaysEmpty: s => s.queue.length === 0 },
+      channels: { queue: { from: "producer", to: "consumer" } },
+    });
+
+    const result = check(spec);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.channels).toEqual({ queue: { from: "producer", to: "consumer" } });
+  });
+});
+
 describe("仕様側の誤りの検出", () => {
   test("アクションが状態を破壊的に変更すると例外になる", () => {
     const spec = defineSpec<{ items: number[] }>({

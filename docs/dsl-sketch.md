@@ -61,6 +61,8 @@ type TraceStep<S> = {
 };
 ```
 
+反例(`ok: false`)には、仕様の`channels`メタデータがそのまま`channels?: Record<string, { from: string; to: string }>`として写る。キーは状態のチャネルフィールド名(配列)、値はそのチャネルの送信元actor(from)・宛先actor(to)。`channels`未指定の仕様では`undefined`のままで、UIは矢印なしのタイムライン表示にフォールバックする。
+
 - 各ステップに状態の完全なスナップショットを持つ。差分表示・一歩ずつ再生・シーケンス図はすべてUI側でこの配列から導出する
 - 検査器はBFSなので、返るトレースは違反への最短経路になる(反例の読みやすさに直結する性質なので、探索順は必ずBFSとする)
 
@@ -82,6 +84,7 @@ type CheckOptions = {
 - プロセスごとのローカル状態 = 状態オブジェクトのフィールド(例: `clientPhase` / `charged`)
 - メッセージチャネル = 配列フィールド(例: `inFlight` / `responses`)。末尾追加・先頭取り出しでFIFO、順序保証のないネットワークは`params`で取り出し位置を選べば表現できる
 - プロセスの帰属は `actor` メタデータで表す
+- どのチャネルフィールドがどの方向のメッセージかは `channels` メタデータで表す(例: [examples/payment-retry.ts](../examples/payment-retry.ts) の `inFlight`(client→server)・`responses`(server→client))。`actor` と同種の可視化専用メタデータで、検査結果には影響しない。詳細は [trace-visualization.md](trace-visualization.md)
 
 インターリーブは「発火可能なアクションを検査器が全部試す」ことで自動的に網羅されるため、プロセス専用のAPIは不要と判断した。
 
@@ -89,6 +92,5 @@ type CheckOptions = {
 
 - `accepting` の命名。`done` / `terminal` 等、非専門家に伝わる語を再検討する
 - 訪問済み集合は正規化JSON文字列の`Set`で持っている。数百万状態級では64bitフィンガープリント+TypedArrayへの置き換えが必要(GOAL.mdの性能方針)
-- メッセージ矢印付きシーケンス図に必要なチャネルメタデータ(`channels`)。詳細は [trace-visualization.md](trace-visualization.md)
 
 データモデル・権限検証(フェーズ3、状態機械とは別の式木ベースのDSL)は [datamodel-sketch.md](datamodel-sketch.md) を参照。

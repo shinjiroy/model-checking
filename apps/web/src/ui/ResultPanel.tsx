@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { CheckResult, TraceStep } from "@model-checking/spec";
+import type { ChannelDef, CheckResult, TraceStep } from "@model-checking/spec";
 import { TraceTimeline } from "./TraceTimeline.js";
 import { StateDiffView } from "./StateDiffView.js";
 
@@ -31,12 +31,18 @@ export function ResultPanel({ result }: Props) {
     <section className="result-panel result-panel--violation">
       <h2 className="violation-banner">違反を検出: {violationLabel(result.violation)}</h2>
       <p>探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
-      <ViolationTrace trace={result.trace} />
+      <ViolationTrace trace={result.trace} channels={result.channels} />
     </section>
   );
 }
 
-function ViolationTrace({ trace }: { trace: TraceStep<unknown>[] }) {
+function ViolationTrace({
+  trace,
+  channels,
+}: {
+  trace: TraceStep<unknown>[];
+  channels?: Record<string, ChannelDef>;
+}) {
   const steps = trace;
   const [selectedIndex, setSelectedIndex] = useState(steps.length - 1);
 
@@ -59,7 +65,7 @@ function ViolationTrace({ trace }: { trace: TraceStep<unknown>[] }) {
 
   return (
     <div className="violation-trace">
-      <TraceTimeline trace={steps} selectedIndex={selectedIndex} onSelect={setSelectedIndex} />
+      <TraceTimeline trace={steps} selectedIndex={selectedIndex} onSelect={setSelectedIndex} channels={channels} />
 
       <div className="step-nav">
         <button type="button" onClick={() => setSelectedIndex((i) => Math.max(0, i - 1))} disabled={selectedIndex === 0}>
