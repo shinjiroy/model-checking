@@ -3,6 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      仕様データを外部へ送らないことをブラウザ側で強制する。狙いは connect-src 'self' で、
+      仕様の内容が外部へ出ていく経路(fetch/XHR/WebSocket/beacon)と外部への遷移を塞ぐ。
+      Workerは同一オリジンのスクリプトなのでこのポリシーを継承する。
+
+      'unsafe-eval' は緩和ではなくこのツールの前提にあたる: 利用者の仕様を
+      esbuild-wasmでバンドルし new Function で実行すること自体が機能の中身になる
+      (esbuild-wasmのコンパイルにも要る)。実行されるのは利用者自身のコードだけで、
+      それが外部へ出られないことを connect-src が担保する。
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    />
     <title>モデル検査SPA</title>
   </head>
   <body>
