@@ -37,7 +37,7 @@ npm install && npm run -w @model-checking/web dev
 
 ## 自分のリポジトリで検査する
 
-DSLは `@model-checking/spec` としてnpm配布する。ブラウザ側はトランスパイルのみで型を見ないため、型チェックは手元のエディタとCIが担当する。
+DSLは `@model-checking/spec` として配布する(GitHub Releaseに添付したtarball)。ブラウザ側はトランスパイルのみで型を見ないため、型チェックは手元のエディタとCIが担当する。
 
 ```bash
 cp -r templates/spec-starter my-design && cd my-design
@@ -55,7 +55,7 @@ npm install && npm run typecheck && npm run check
 | [tutorial.md](docs/tutorial.md) | 最初の1仕様を書いて検査するまで |
 | [dsl-sketch.md](docs/dsl-sketch.md) | 状態機械DSLのAPIとトレース形式 |
 | [datamodel-sketch.md](docs/datamodel-sketch.md) | データモデル・権限のDSLと小スコープ列挙 |
-| [spec-package.md](docs/spec-package.md) | npm配布の構成、公開手順、型チェックフロー |
+| [spec-package.md](docs/spec-package.md) | 配布物の構成、リリース手順、型チェックフロー |
 
 ### 設計を知る
 

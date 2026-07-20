@@ -9,6 +9,18 @@ npm run typecheck   # 仕様の型チェック
 npm run check       # 検査(反例が出たら落ちる)
 ```
 
+## DSLの入手元
+
+`@model-checking/spec` はnpmレジストリには公開していない。`package.json` はGitHub Releaseに添付されたtarballを直接指している。
+
+```json
+"dependencies": {
+  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.0/model-checking-spec-0.1.0.tgz"
+}
+```
+
+URLにバージョンが入っているので参照先は自動では動かない。上げるときはこのURLを書き換える。利用できるバージョンは[リリース一覧](https://github.com/shinjiroy/model-checking/releases)にある。
+
 ## 中身
 
 | パス | 役割 |

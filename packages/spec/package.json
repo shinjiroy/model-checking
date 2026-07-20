@@ -1,6 +1,7 @@
 {
   "name": "@model-checking/spec",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "description": "モデル検査DSL(状態・アクション・不変条件の定義)とBFSによる明示的状態探索器",
   "license": "MIT",
@@ -25,9 +26,6 @@
     }
   },
   "files": ["dist", "src", "!src/bench", "README.md", "LICENSE"],
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "test": "vitest run",
