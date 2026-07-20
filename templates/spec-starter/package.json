@@ -8,7 +8,7 @@
     "check": "vitest run"
   },
   "dependencies": {
-    "@model-checking/spec": "^0.1.0"
+    "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.0/model-checking-spec-0.1.0.tgz"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

@@ -1,16 +1,16 @@
-# DSLのnpm配布と型チェック
+# DSLの配布と型チェック
 
-[設計方針](design-goals.md)の「型チェックはDSLをnpm配布して手元のエディタ・CIに寄せる」の実装。
+[設計方針](design-goals.md)の「型チェックはDSLをパッケージ配布して手元のエディタ・CIに寄せる」の実装。
 
 ## なぜエディタ・CIに寄せるのか
 
 SPAは仕様をesbuild-wasmで**トランスパイル**するだけで、型チェックはしない。型情報を捨てて速く回すのがブラウザ側の役割で、型の誤りは検査結果にも反例にも現れない。
 
-そのため型チェックは、利用者が既に持っている場所 — エディタとCI — が担う。仕様がTypeScriptである利点(既存のエディタ・型チェック・レビューフローがそのまま使える)は、DSLがnpmパッケージとして普通に `import` できて初めて成立する。
+そのため型チェックは、利用者が既に持っている場所 — エディタとCI — が担う。仕様がTypeScriptである利点(既存のエディタ・型チェック・レビューフローがそのまま使える)は、DSLが普通のパッケージとして `import` できて初めて成立する。
 
 ## 配布物
 
-[packages/spec/](../packages/spec/) を `@model-checking/spec` として配布する。`tsc` で `dist/` にJSと `.d.ts`(宣言マップ・ソースマップ付き)を出す。宣言マップの飛び先になる `src/`(ベンチ用モデルを除く)も同梱するので、利用者のエディタで「定義へ移動」するとDSLのソースに飛べる。
+[packages/spec/](../packages/spec/) を `@model-checking/spec` として配布する。npmレジストリには公開せず、tarballをGitHub Releaseに添付する形を取る(→[リリース手順](#リリース手順))。`tsc` で `dist/` にJSと `.d.ts`(宣言マップ・ソースマップ付き)を出す。宣言マップの飛び先になる `src/`(ベンチ用モデルを除く)も同梱するので、利用者のエディタで「定義へ移動」するとDSLのソースに飛べる。
 
 ```bash
 npm run build -w @model-checking/spec
@@ -32,7 +32,7 @@ npm run build -w @model-checking/spec
 
 モノレポ内(vite / vitest の `resolve.conditions`、tscの `customConditions`)だけがこの条件を有効にする。**モノレポの開発ではビルドせずソースを直接参照でき、配布物を使う利用者には `dist` が解決される。**
 
-この形にした理由は、`publishConfig` による `exports` の差し替えが `npm pack` の生成物に反映されず、公開物が `src` を指したまま壊れるため。条件付きexportsなら公開する `package.json` そのものが正しい。
+`publishConfig` で `exports` を差し替える案は採らなかった。`npm pack` の生成物に反映されず、配布物が存在しない `src` を指したまま壊れることを実際に固めて確認したため。条件付きexportsなら配布する `package.json` そのものが正しい形になる。
 
 条件を足す場所は次の3つで、いずれかが漏れると `Failed to resolve entry for package "@model-checking/spec"` になる。
 
@@ -46,22 +46,40 @@ npm run build -w @model-checking/spec
 
 ワークスペースのシンボリックリンク越しでは、`exports` の解決も `files` の過不足も検証できない(`src` が手元にあるので壊れていても動いてしまう)。[scripts/verify-package.sh](../scripts/verify-package.sh) が `npm pack` で固めた tarball を雛形にインストールし、利用者と同じ経路で型チェックと検査を通す。
 
+このスクリプトは**手元で固めたtarballを直接インストールする**ので、雛形が宣言しているReleaseのURLそのものは経路に入らない。検証できるのは配布物の中身(exportsの解決・filesの過不足・型)であって、URLが生きているかではない。
+
 ```bash
 npm run verify:package
 ```
 
 CI([ci.yml](../.github/workflows/ci.yml))とリリース([release.yml](../.github/workflows/release.yml))の両方で走る。
 
-## 公開手順
+## リリース手順
 
 ```bash
 npm version --workspace @model-checking/spec patch
 git push && git push --tags   # spec-v<version> タグ
 ```
 
-`spec-v*` タグのpushで [release.yml](../.github/workflows/release.yml) が動き、テスト・型チェック・配布物の検証を通してから `npm publish --provenance` する。provenanceにより、公開物がどのコミットのどのワークフローから作られたかがnpm上で辿れる。
+`spec-v*` タグのpushで [release.yml](../.github/workflows/release.yml) が動き、タグとversionの一致確認・テスト・型チェック・配布物の検証を通してから、tarballをGitHub Releaseに添付する。追加のSecretは要らない(`github.token` で足りる)。
 
-リポジトリのSecretに `NPM_TOKEN`(publish権限のあるAutomationトークン)が要る。
+### なぜnpmレジストリに公開しないのか
+
+このツールは限られた範囲で使う前提で、npmレジストリに載せる必要がない。一方でレジストリ公開には、スコープの取得・`NPM_TOKEN` の管理・一度publishしたバージョンを実質取り消せないという運用が付いてくる。
+
+代わりにGitHub Releaseへtarballを添付し、利用者はそのURLを依存に書く。
+
+```json
+"dependencies": {
+  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.0/model-checking-spec-0.1.0.tgz"
+}
+```
+
+URLにバージョンが入るので、参照先は自動では動かない。上げるときは依存のURLを書き換える。
+
+`packages/spec/package.json` には `private: true` を付けてあり、誤って `npm publish` しても弾かれる(`npm pack` は通るのでリリースには影響しない)。
+
+**git依存では代替できない。** npmはgit依存のサブディレクトリ指定に対応しないため、`github:shinjiroy/model-checking` 形式でモノレポの `packages/spec` だけを入れることはできない。
 
 ## 利用者側の型チェックフロー
 

@@ -1,24 +1,22 @@
 name: Release
 
-# @model-checking/spec を npm へ公開する。
-# packages/spec/package.json の version を上げ、`spec-v<version>` タグを打つと動く。
-#   npm version --workspace @model-checking/spec patch
-#   git tag spec-v0.1.1 && git push origin spec-v0.1.1
+# @model-checking/spec の配布物(tarball)をGitHub Releaseに添付する。
+# npmレジストリには公開せず、利用者はReleaseのURLを依存に書いて入れる
+# (npmはgit依存のサブディレクトリ指定に対応しないため、モノレポの
+#  packages/spec だけをgit URLで入れることはできない)。
 #
-# 事前にリポジトリのSecretに NPM_TOKEN(publish権限のあるAutomationトークン)が要る。
+#   npm version --workspace @model-checking/spec patch
+#   git push && git push --tags
 on:
   push:
     tags: ["spec-v*"]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  # npmのprovenance(公開物とビルド元の紐付け)に要る。
-  # provenanceは公開リポジトリが前提で、privateリポジトリからは生成できない
-  id-token: write
+  contents: write # Releaseの作成と資産のアップロードに要る
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,9 +25,19 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          registry-url: https://registry.npmjs.org
 
       - run: npm ci
+
+      # タグとpackage.jsonのversionがずれたまま配布すると、
+      # 利用者が入れたURLの中身と表示バージョンが食い違う
+      - name: タグとバージョンの一致を確認
+        run: |
+          tag_version="${GITHUB_REF_NAME#spec-v}"
+          pkg_version="$(node -p "require('./packages/spec/package.json').version")"
+          if [ "$tag_version" != "$pkg_version" ]; then
+            echo "タグ($tag_version)とpackage.jsonのversion($pkg_version)が一致しません" >&2
+            exit 1
+          fi
 
       - name: テスト
         run: npm test
@@ -41,7 +49,16 @@ jobs:
       - name: 配布物の検証
         run: ./scripts/verify-package.sh
 
-      - name: 公開
-        run: npm publish --workspace @model-checking/spec --provenance
+      - name: 配布物を固める
+        id: pack
+        run: |
+          tarball="$(cd packages/spec && npm pack --silent)"
+          echo "path=packages/spec/$tarball" >> "$GITHUB_OUTPUT"
+
+      - name: Releaseに添付する
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "${{ steps.pack.outputs.path }}" \
+            --title "@model-checking/spec $GITHUB_REF_NAME" \
+            --generate-notes
