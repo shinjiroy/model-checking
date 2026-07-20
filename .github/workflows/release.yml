@@ -13,7 +13,9 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npmのprovenance(公開物とビルド元の紐付け)に要る
+  # npmのprovenance(公開物とビルド元の紐付け)に要る。
+  # provenanceは公開リポジトリが前提で、privateリポジトリからは生成できない
+  id-token: write
 
 jobs:
   publish:

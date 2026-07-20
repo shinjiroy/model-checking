@@ -24,7 +24,7 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": ["dist", "src", "!src/bench", "README.md", "LICENSE"],
   "publishConfig": {
     "access": "public"
   },

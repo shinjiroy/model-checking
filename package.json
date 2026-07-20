@@ -1,6 +1,7 @@
 {
   "name": "model-checking",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
