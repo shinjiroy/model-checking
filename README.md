@@ -11,6 +11,7 @@ npmワークスペースのモノレポ。
 | [packages/spec/](packages/spec/) | 仕様記述DSL(`defineSpec`)+BFS検査器(`check`)、データモデル検証DSL(`defineModel`)+小スコープ列挙(`checkModel`)。ブラウザ非依存 |
 | [apps/web/](apps/web/) | SPA。仕様ファイルをesbuild-wasmでブラウザ内バンドルし、Worker上で検査、反例をactorレーンのタイムライン+状態diff(状態機械)またはインスタンスの表(データモデル)で可視化 |
 | [examples/](examples/) | デモ仕様兼回帰テスト(tutorial-withdraw、order-payment、payment-retry、doc-permission、conduit-favorite-count、conduit-comment-delete) |
+| [templates/spec-starter/](templates/spec-starter/) | 利用者向けの雛形。`@model-checking/spec` を入れて型チェックと検査をCIで回す |
 | [docs/](docs/) | DSL・トレース形式・可視化の設計判断 |
 
 ## 使い方(SPA)
@@ -43,6 +44,17 @@ Dockerでも同じことができる:
 docker compose run --rm test
 docker compose run --rm typecheck
 ```
+
+## 仕様を自分のリポジトリで検査する
+
+DSLは `@model-checking/spec` としてnpm配布する。ブラウザ側はトランスパイルのみで型を見ないため、型チェックは手元のエディタとCIが担当する。
+
+```bash
+cp -r templates/spec-starter my-design && cd my-design
+npm install && npm run typecheck && npm run check
+```
+
+配布物の構成・公開手順・型チェックフローは [docs/spec-package.md](docs/spec-package.md) を参照。
 
 ## デプロイ
 

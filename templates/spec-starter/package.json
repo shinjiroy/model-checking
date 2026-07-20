@@ -1,0 +1,17 @@
+{
+  "name": "spec-starter",
+  "private": true,
+  "type": "module",
+  "description": "@model-checking/spec で設計を検査するプロジェクトの雛形",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "check": "vitest run"
+  },
+  "dependencies": {
+    "@model-checking/spec": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

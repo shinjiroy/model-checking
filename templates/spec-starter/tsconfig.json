@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+
+    // "bundler" にすると、拡張子なしの相対import(./specs/order)がそのまま書ける。
+    // ブラウザ側の検査(esbuild-wasm)も同じ解決規則なので、
+    // エディタで通った仕様はSPAでもそのまま読める
+    "moduleResolution": "bundler",
+
+    "strict": true,
+
+    // 配列・レコードの添字アクセスに undefined を混ぜる。
+    // 仕様では s.queue[0] のような添字アクセスが頻出し、空配列のときの
+    // 取りこぼしがそのままモデルの誤りになるため、有効にしておく
+    "noUncheckedIndexedAccess": true,
+
+    "noEmit": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["specs"]
+}

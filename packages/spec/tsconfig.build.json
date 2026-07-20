@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // 配布物の解決は bundler ではなく Node/npm 側の規則に従う。
+    // 利用者のtsconfigが nodenext / bundler のどちらでも読めるよう、
+    // 出力する相対importは拡張子付き(.js)にする(ソースが最初からその形になっている)
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"],
+  // ベンチマーク用のモデルは配布物に含めない(公開APIではない)
+  "exclude": ["src/bench"]
+}
