@@ -1,7 +1,7 @@
 # 状態探索の性能ベンチマーク
 
 `packages/spec/src/checker.ts`の`check`(BFS明示的状態探索)は、訪問済み状態の重複排除に
-`new Set<string>()`と正規化JSON文字列(`canonicalKey`)を使っている。GOAL.mdの方針では、この
+`new Set<string>()`と正規化JSON文字列(`canonicalKey`)を使っている。[設計方針](design-goals.md)では、この
 表現をより省メモリ・高速な64bitフィンガープリント+TypedArrayに置き換えるM3は「性能が問題になってから
 着手する」保留事項になっている。本書は、M3に着手するかどうかの判断材料および着手後の効果測定の基準となる、
 現状(JSON文字列Set)のベースライン数値を記録する。

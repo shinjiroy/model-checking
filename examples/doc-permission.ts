@@ -1,7 +1,7 @@
 import { defineModel, forall, rel, or, implies, iff } from "@model-checking/spec";
 
 /**
- * フェーズ3の題材: ドキュメント共有の権限モデル。
+ * 題材: ドキュメント共有の権限モデル(データモデル・権限)。
  *
  * 「ドキュメントを共有されたユーザーには編集権も渡る」という設計をconstraintsでcanEditとして定義し、
  * 「編集できるのはオーナーか管理者のみ」という意図した性質をassertionとして検証する。

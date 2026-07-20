@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { check, defineSpec } from "../src/index.js";
 import { paymentRetrySpec } from "../../../examples/payment-retry.js";
 
-describe("決済リトライによる二重課金(フェーズ2題材: 複数プロセス)", () => {
+describe("決済リトライによる二重課金(複数プロセスの題材)", () => {
   test("タイムアウト・リトライで二重課金される反例を最短経路で見つける", () => {
     const result = check(paymentRetrySpec);
 
