@@ -3,7 +3,7 @@ export type { ActionDef, ChannelDef, Spec } from "./spec.js";
 export { check } from "./checker.js";
 export type { CheckOptions, CheckResult, TraceStep, Violation } from "./checker.js";
 
-// データモデル・権限検証(フェーズ3)。詳細はdocs/datamodel-sketch.mdを参照
+// データモデル・権限検証。詳細はdocs/datamodel-sketch.mdを参照
 export {
   defineModel,
   forall,

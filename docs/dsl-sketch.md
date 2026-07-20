@@ -1,4 +1,4 @@
-# DSL設計(フェーズ1)
+# DSL設計(状態機械)
 
 題材の仕様を先に書き、そこからDSLのAPIとトレース形式を逆算した(DSLファースト)。実装は [packages/spec/src/](../packages/spec/src/)、題材の仕様は [examples/order-payment.ts](../examples/order-payment.ts)、挙動の仕様はテスト [packages/spec/tests/checker.test.ts](../packages/spec/tests/checker.test.ts) にある。
 
@@ -7,7 +7,7 @@
 ECの典型的な非同期フロー。注文に対して決済をリクエストすると、決済プロバイダからWebhookが非同期に届く。ユーザーはその間もキャンセルできる。
 
 - 検出できるバグ: **キャンセル済みの注文に対してWebhook処理が決済を確定してしまう**(キャンセルとWebhook到着の競合)。検査は「requestPayment → cancel → handleWebhook → handleWebhook」の4ステップを最短反例として返す
-- この題材が良い理由: 状態機械と非同期メッセージの両方を含み、フェーズ1の範囲でタイミング依存バグが1件必ず見つかる
+- この題材が良い理由: 状態機械と非同期メッセージの両方を含み、この範囲でタイミング依存バグが1件必ず見つかる
 
 検査器は各状態で `when` が真のアクションを**全部**試す。`cancel` と `handleWebhook` が同時に発火可能な状態では両方の分岐を探索するので、非同期の全インターリーブが自動的に網羅される。
 
@@ -38,7 +38,7 @@ type ActionDef<S, P = unknown> = {
 - **不変条件**: `(state) => boolean`。時系列性質(「一度Xになったら二度とYにならない」)は状態に補助変数を足して書く(例: `wasCancelled: boolean`)。TLA+と同じ流儀
   - 不変条件に状態履歴を渡す案は不採用とした。履歴を持つと「同じ状態でも履歴が違えば別物」になり、重複排除と干渉して状態空間が膨らむため
 - **デッドロック**: 発火可能なアクションが1つもない状態。`done` が真の状態は正常終了として除外する
-- 活性(liveness)・公平性はフェーズ1では持たない(GOAL.mdの非ゴールに準拠)
+- 活性(liveness)・公平性は持たない([設計方針](design-goals.md)の非ゴールに準拠)
 
 ## 検査結果・反例トレースの形式
 
@@ -77,7 +77,7 @@ type CheckOptions = {
 
 - `onProgress` は同期的に呼ばれる。検査器自身は間引き(1024状態ごと)以上のことをせず、UIスレッドへの転送のスロットリングは呼び出し側(Web Worker上のホスト)の責務とする
 
-## 複数プロセスの表現(フェーズ2の検証結果)
+## 複数プロセスの表現
 
 専用機構は設けず、単一の状態オブジェクト+アクションの集まりで表現する。[examples/payment-retry.ts](../examples/payment-retry.ts)(クライアント・サーバー2プロセスのタイムアウト・リトライによる二重課金)で書き味と検出力を検証済み。慣習は:
 
@@ -90,6 +90,6 @@ type CheckOptions = {
 
 ## 未決事項
 
-- 訪問済み集合は正規化JSON文字列の`Set`で持っている。数百万状態級では64bitフィンガープリント+TypedArrayへの置き換えが必要(GOAL.mdの性能方針)
+- 訪問済み集合は正規化JSON文字列の`Set`で持っている。数百万状態級では64bitフィンガープリント+TypedArrayへの置き換えが必要([設計方針](design-goals.md)の性能方針)
 
-データモデル・権限検証(フェーズ3、状態機械とは別の式木ベースのDSL)は [datamodel-sketch.md](datamodel-sketch.md) を参照。
+データモデル・権限検証(状態機械とは別の式木ベースのDSL)は [datamodel-sketch.md](datamodel-sketch.md) を参照。

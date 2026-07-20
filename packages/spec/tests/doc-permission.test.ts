@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { checkModel, defineModel, forall, rel, or, implies, iff } from "../src/index.js";
 import { docPermissionModel } from "../../../examples/doc-permission.js";
 
-describe("ドキュメント共有の権限モデル(フェーズ3題材: 権限の抜け漏れ)", () => {
+describe("ドキュメント共有の権限モデル(権限の抜け漏れの題材)", () => {
   test("sharedWith経由の編集権が「オーナーか管理者のみ」の意図を破る反例を見つける", () => {
     const result = checkModel(docPermissionModel);
 

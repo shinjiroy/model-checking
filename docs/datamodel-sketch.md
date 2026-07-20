@@ -1,7 +1,7 @@
-# データモデル・権限検証(フェーズ3)設計
+# データモデル・権限検証の設計
 
 状態機械側(`packages/spec/src/spec.ts`・`checker.ts`)とは別に、`packages/spec/src/datamodel/`が
-データモデル・権限モデルの検証(GOAL.mdの検証対象「データモデル・権限」)を担う。実装は
+データモデル・権限モデルの検証([設計方針](design-goals.md)の検証対象「データモデル・権限」)を担う。実装は
 [packages/spec/src/datamodel/](../packages/spec/src/datamodel/)、題材の仕様は
 [examples/doc-permission.ts](../examples/doc-permission.ts)、挙動の仕様はテスト
 [packages/spec/tests/datamodel-formula.test.ts](../packages/spec/tests/datamodel-formula.test.ts)・
@@ -19,9 +19,9 @@
 
 ## なぜboolean関数ではなく式木(Formula)なのか
 
-GOAL.mdの技術方針より:
+[設計方針](design-goals.md)より:
 
-> データモデル側(フェーズ3)の述語はコンビネータ(`forall`/`exists`/`eq`等)の式木で書く。boolean関数は
+> データモデル側の述語はコンビネータ(`forall`/`exists`/`eq`等)の式木で書く。boolean関数は
 > SMT式に翻訳できないため、全列挙とZ3の両方で解釈できるASTを挟み、仕様を書き換えずにエンジンを差し替え
 > 可能にする
 
@@ -144,5 +144,5 @@ function checkModel(model: ModelDef, options?: ModelCheckOptions): ModelCheckRes
 評価器(`evalFormula`)はASTを素直に再帰評価するだけの実装で、量化は該当ソートの全原子への`every`/`some`、
 関係所属はタプル集合への線形探索で行う。
 
-小スコープの全列挙は関係の数・スコープに対して指数的に組み合わせが増えるため(GOAL.mdの非ゴール
+小スコープの全列挙は関係の数・スコープに対して指数的に組み合わせが増えるため(設計方針の非ゴール
 「大規模状態空間の検査」を参照)、実運用ではUser:2〜3・Doc:1〜2程度の小さいスコープを想定している。
