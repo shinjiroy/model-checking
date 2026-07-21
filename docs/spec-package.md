@@ -94,7 +94,7 @@ PR が main にマージされ、`packages/spec/package.json` の version 変更
 
 ```json
 "dependencies": {
-  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.0/model-checking-spec-0.1.0.tgz"
+  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz"
 }
 ```
 

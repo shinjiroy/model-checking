@@ -15,7 +15,7 @@ npm run check       # 検査(反例が出たら落ちる)
 
 ```json
 "dependencies": {
-  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.0/model-checking-spec-0.1.0.tgz"
+  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz"
 }
 ```
 
