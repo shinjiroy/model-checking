@@ -1,6 +1,6 @@
 {
   "name": "@model-checking/spec",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "モデル検査DSL(状態・アクション・不変条件の定義)とBFSによる明示的状態探索器",
@@ -11,7 +11,13 @@
     "directory": "packages/spec"
   },
   "homepage": "https://github.com/shinjiroy/model-checking#readme",
-  "keywords": ["model-checking", "formal-methods", "specification", "typescript", "dsl"],
+  "keywords": [
+    "model-checking",
+    "formal-methods",
+    "specification",
+    "typescript",
+    "dsl"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -25,7 +31,13 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist", "src", "!src/bench", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "src",
+    "!src/bench",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "test": "vitest run",
