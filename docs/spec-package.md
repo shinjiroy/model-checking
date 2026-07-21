@@ -56,12 +56,35 @@ CI([ci.yml](../.github/workflows/ci.yml))とリリース([release.yml](../.githu
 
 ## リリース手順
 
+[scripts/deploy.sh](../scripts/deploy.sh) を回して出てきた PR をマージするだけでよい。main で回せばリリース用ブランチも自動で切る。
+
 ```bash
-npm version --workspace @model-checking/spec patch
-git push && git push --tags   # spec-v<version> タグ
+# main で回すと release/spec-v0.1.1 を切り、コミットして PR まで出す
+./scripts/deploy.sh patch --pr
 ```
 
-`spec-v*` タグのpushで [release.yml](../.github/workflows/release.yml) が動き、タグとversionの一致確認・テスト・型チェック・配布物の検証を通してから、tarballをGitHub Releaseに添付する。追加のSecretは要らない(`github.token` で足りる)。
+`--pr` を外せばコミットまでで止まり、push と PR は手でやる。引数だけで完結するので、この手順はエージェントに丸ごと任せられる。マージだけは人間の操作に残してある(マージがリリースの発火点になる)。
+
+```bash
+./scripts/deploy.sh patch    # コミットまで。この先の push / PR コマンドは実行後に表示される
+```
+
+`deploy.sh` は `packages/spec` の version を上げ、それに追随して**バージョンが埋め込まれている箇所を全部書き換える**。配布URLにはバージョンが入る([→後述](#なぜnpmレジストリに公開しないのか))ので、version だけ上げてURLを書き換え忘れると、新しい Release はできても雛形が古い版を指したままになる。この書き換え漏れをスクリプトの post-check で潰す。
+
+| 追随させる箇所 | 理由 |
+| --- | --- |
+| [templates/spec-starter/package.json](../templates/spec-starter/package.json) | 利用者が入れる依存URL(実害あり) |
+| [templates/spec-starter/README.md](../templates/spec-starter/README.md) / この文書 | 例として載せているURL(表示の一貫性) |
+
+PR が main にマージされ、`packages/spec/package.json` の version 変更が入ると [tag-on-version.yml](../.github/workflows/tag-on-version.yml) が動き、`spec-v<version>` タグが未作成なら自動で切る。続けて [release.yml](../.github/workflows/release.yml) を `workflow_call` で呼び、タグとversionの一致確認・テスト・型チェック・配布物の検証を通してから、tarballをGitHub Releaseに添付する。追加のSecretは要らない(`github.token` で足りる)。**マージ後の手作業は要らない。**
+
+タグを手で切って push する(`spec-v*` タグの push)経路も残してあり、その場合も同じ release.yml が走る。
+
+### なぜタグ作成を自動化するのか
+
+配布URLにはバージョンが入る([→後述](#なぜnpmレジストリに公開しないのか))。version を上げても対応する Release を作り忘れると、雛形が宣言するURLが 404 を返して利用者の `npm install` が丸ごと落ちる(issue #39)。「version を上げる」と「Release を作る」を別々の人手に分けている限りこの齟齬は起きうるので、version の変更を唯一のトリガーにして両者を1本のフローに束ねる。
+
+> `GITHUB_TOKEN` で push したタグは release.yml の `push: tags` トリガーを発火しない(ワークフローの無限ループを防ぐGitHubの仕様)。そのため tag-on-version.yml は release.yml を `workflow_call` で明示的に呼ぶ。PAT を持ち込まずに済む。
 
 ### なぜnpmレジストリに公開しないのか
 
