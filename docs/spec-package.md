@@ -56,12 +56,22 @@ CI([ci.yml](../.github/workflows/ci.yml))とリリース([release.yml](../.githu
 
 ## リリース手順
 
+version を上げて main に push するだけでよい。
+
 ```bash
-npm version --workspace @model-checking/spec patch
-git push && git push --tags   # spec-v<version> タグ
+npm version --workspace @model-checking/spec patch   # package.json を書き換えてコミット
+git push
 ```
 
-`spec-v*` タグのpushで [release.yml](../.github/workflows/release.yml) が動き、タグとversionの一致確認・テスト・型チェック・配布物の検証を通してから、tarballをGitHub Releaseに添付する。追加のSecretは要らない(`github.token` で足りる)。
+`packages/spec/package.json` の version が変わって main に入ると [tag-on-version.yml](../.github/workflows/tag-on-version.yml) が動き、`spec-v<version>` タグが未作成なら自動で切る。続けて [release.yml](../.github/workflows/release.yml) を `workflow_call` で呼び、タグとversionの一致確認・テスト・型チェック・配布物の検証を通してから、tarballをGitHub Releaseに添付する。追加のSecretは要らない(`github.token` で足りる)。
+
+タグを手で切って push する(`spec-v*` タグの push)経路も残してあり、その場合も同じ release.yml が走る。
+
+### なぜタグ作成を自動化するのか
+
+配布URLにはバージョンが入る([→後述](#なぜnpmレジストリに公開しないのか))。version を上げても対応する Release を作り忘れると、雛形が宣言するURLが 404 を返して利用者の `npm install` が丸ごと落ちる(issue #39)。「version を上げる」と「Release を作る」を別々の人手に分けている限りこの齟齬は起きうるので、version の変更を唯一のトリガーにして両者を1本のフローに束ねる。
+
+> `GITHUB_TOKEN` で push したタグは release.yml の `push: tags` トリガーを発火しない(ワークフローの無限ループを防ぐGitHubの仕様)。そのため tag-on-version.yml は release.yml を `workflow_call` で明示的に呼ぶ。PAT を持ち込まずに済む。
 
 ### なぜnpmレジストリに公開しないのか
 

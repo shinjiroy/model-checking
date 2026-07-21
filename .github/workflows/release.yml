@@ -5,11 +5,21 @@ name: Release
 # (npmはgit依存のサブディレクトリ指定に対応しないため、モノレポの
 #  packages/spec だけをgit URLで入れることはできない)。
 #
+# 通常は packages/spec の version を上げて main に push すれば
+# tag-on-version.yml がタグを切り、workflow_call でこのワークフローを呼ぶ。
+# 手でタグを切る(spec-v* を push する)経路も残してある。
+#
 #   npm version --workspace @model-checking/spec patch
-#   git push && git push --tags
+#   git push
 on:
   push:
     tags: ["spec-v*"]
+  workflow_call:
+    inputs:
+      tag:
+        description: リリースするタグ(spec-v<version>)。tag-on-version.yml から渡す
+        required: true
+        type: string
   workflow_dispatch:
 
 permissions:
@@ -18,8 +28,14 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # push経由なら github.ref_name、workflow_call経由なら inputs.tag。
+    # どちらの経路でも同じタグ名で以降を回す
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
 
       - uses: actions/setup-node@v4
         with:
@@ -32,7 +48,7 @@ jobs:
       # 利用者が入れたURLの中身と表示バージョンが食い違う
       - name: タグとバージョンの一致を確認
         run: |
-          tag_version="${GITHUB_REF_NAME#spec-v}"
+          tag_version="${TAG#spec-v}"
           pkg_version="$(node -p "require('./packages/spec/package.json').version")"
           if [ "$tag_version" != "$pkg_version" ]; then
             echo "タグ($tag_version)とpackage.jsonのversion($pkg_version)が一致しません" >&2
@@ -59,6 +75,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "${{ steps.pack.outputs.path }}" \
-            --title "@model-checking/spec $GITHUB_REF_NAME" \
+          gh release create "$TAG" "${{ steps.pack.outputs.path }}" \
+            --title "@model-checking/spec $TAG" \
             --generate-notes
