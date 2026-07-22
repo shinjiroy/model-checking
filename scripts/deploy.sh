@@ -8,9 +8,11 @@
 # PR まで出す。「version は上げたが URL を書き換え忘れる」齟齬(issue #39 の
 # 裏返し)を post-check で潰す。
 #
-# タグ作成と GitHub Release は PR が main にマージされたあと自動化されている
-# (.github/workflows/tag-on-version.yml)。このスクリプトはタグを切らないし、
-# マージもしない(リリースの発火は人間のマージ操作に残す)。
+# タグ作成と GitHub Release は release/* ブランチの PR が main にマージされたあと
+# 自動化されている(.github/workflows/release-on-merge.yml)。このスクリプトは
+# タグを切らないし、マージもしない(リリースの発火は人間のマージ操作に残す)。
+# ブランチ名が release/ で始まらないとこの自動化は発火しないので、--branch を
+# 指定するなら release/ を頭に付けること。
 #
 #   ./scripts/deploy.sh patch                 # 0.1.0 -> 0.1.1。ブランチを切ってコミットまで
 #   ./scripts/deploy.sh minor --pr            # push して PR まで出す(エージェント向け)
@@ -125,7 +127,7 @@ if $open_pr; then
   git push -u origin "$branch"
   gh pr create --fill
   echo
-  echo "==> PR を出した。マージすると tag-on-version.yml が spec-v$new を切り、"
+  echo "==> PR を出した。マージすると release-on-merge.yml が spec-v$new を切り、"
   echo "    release.yml が Release と tarball を作る。マージ後の手作業は要らない。"
 else
   cat <<EOF
@@ -133,7 +135,7 @@ else
 ==> この先の手順:
     git push -u origin $branch
     gh pr create --fill
-  マージすると tag-on-version.yml が spec-v$new を切り、release.yml が
+  マージすると release-on-merge.yml が spec-v$new を切り、release.yml が
   Release と tarball を作る。マージ後の手作業は要らない。
   (このスクリプトに --pr を付ければ push と PR 作成もやる)
 EOF

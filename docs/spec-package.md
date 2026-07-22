@@ -76,15 +76,17 @@ CI([ci.yml](../.github/workflows/ci.yml))とリリース([release.yml](../.githu
 | [templates/spec-starter/package.json](../templates/spec-starter/package.json) | 利用者が入れる依存URL(実害あり) |
 | [templates/spec-starter/README.md](../templates/spec-starter/README.md) / この文書 | 例として載せているURL(表示の一貫性) |
 
-PR が main にマージされ、`packages/spec/package.json` の version 変更が入ると [tag-on-version.yml](../.github/workflows/tag-on-version.yml) が動き、`spec-v<version>` タグが未作成なら自動で切る。続けて [release.yml](../.github/workflows/release.yml) を `workflow_call` で呼び、タグとversionの一致確認・テスト・型チェック・配布物の検証を通してから、tarballをGitHub Releaseに添付する。追加のSecretは要らない(`github.token` で足りる)。**マージ後の手作業は要らない。**
+`release/*` ブランチの PR が main にマージされると [release-on-merge.yml](../.github/workflows/release-on-merge.yml) が動き、`packages/spec/package.json` の version から `spec-v<version>` タグを未作成なら自動で切る。続けて [release.yml](../.github/workflows/release.yml) を `workflow_call` で呼び、タグとversionの一致確認・テスト・型チェック・配布物の検証を通してから、tarballをGitHub Releaseに添付する。追加のSecretは要らない(`github.token` で足りる)。**マージ後の手作業は要らない。**
 
 タグを手で切って push する(`spec-v*` タグの push)経路も残してあり、その場合も同じ release.yml が走る。
 
-### なぜタグ作成を自動化するのか
+### なぜリリースを自動化するのか
 
-配布URLにはバージョンが入る([→後述](#なぜnpmレジストリに公開しないのか))。version を上げても対応する Release を作り忘れると、雛形が宣言するURLが 404 を返して利用者の `npm install` が丸ごと落ちる(issue #39)。「version を上げる」と「Release を作る」を別々の人手に分けている限りこの齟齬は起きうるので、version の変更を唯一のトリガーにして両者を1本のフローに束ねる。
+配布URLにはバージョンが入る([→後述](#なぜnpmレジストリに公開しないのか))。version を上げても対応する Release を作り忘れると、雛形が宣言するURLが 404 を返して利用者の `npm install` が丸ごと落ちる(issue #39)。「version を上げる」と「Release を作る」を別々の人手に分けている限りこの齟齬は起きうるので、リリースを1本のフローに束ねる。
 
-> `GITHUB_TOKEN` で push したタグは release.yml の `push: tags` トリガーを発火しない(ワークフローの無限ループを防ぐGitHubの仕様)。そのため tag-on-version.yml は release.yml を `workflow_call` で明示的に呼ぶ。PAT を持ち込まずに済む。
+発火は **`release/*` ブランチのマージ** に絞っている。「version が変わった」を条件にすると、依存追加やスクリプト変更など**リリースと無関係な `package.json` の変更でも走りうる**。リリース用ブランチ(`deploy.sh` が切る `release/spec-v<version>`)のマージだけを条件にすることで、リリース意図をブランチ名で明示できる。
+
+> `GITHUB_TOKEN` で push したタグは release.yml の `push: tags` トリガーを発火しない(ワークフローの無限ループを防ぐGitHubの仕様)。そのため release-on-merge.yml は release.yml を `workflow_call` で明示的に呼ぶ。PAT を持ち込まずに済む。
 
 ### なぜnpmレジストリに公開しないのか
 

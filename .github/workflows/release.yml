@@ -5,19 +5,16 @@ name: Release
 # (npmはgit依存のサブディレクトリ指定に対応しないため、モノレポの
 #  packages/spec だけをgit URLで入れることはできない)。
 #
-# 通常は packages/spec の version を上げて main に push すれば
-# tag-on-version.yml がタグを切り、workflow_call でこのワークフローを呼ぶ。
-# 手でタグを切る(spec-v* を push する)経路も残してある。
-#
-#   npm version --workspace @model-checking/spec patch
-#   git push
+# 通常は release/* ブランチの PR がマージされると release-on-merge.yml が
+# タグを切り、workflow_call でこのワークフローを呼ぶ。リリース準備は
+# scripts/deploy.sh が受け持つ。手でタグを切る(spec-v* を push する)経路も残してある。
 on:
   push:
     tags: ["spec-v*"]
   workflow_call:
     inputs:
       tag:
-        description: リリースするタグ(spec-v<version>)。tag-on-version.yml から渡す
+        description: リリースするタグ(spec-v<version>)。release-on-merge.yml から渡す
         required: true
         type: string
   workflow_dispatch:
