@@ -46,7 +46,9 @@ function StepCard({ step, index, selected, violation, arrows, onSelect }: StepCa
     >
       <span className="flex items-center gap-1.5">
         <span className={`font-semibold ${violation ? "text-rose-700" : "text-slate-400"}`}>#{index}</span>
-        <span className="truncate font-semibold text-slate-900">{step.action ?? "(初期状態)"}</span>
+        <span className="truncate font-semibold text-slate-900" title={step.action ?? undefined}>
+          {step.action ?? "(初期状態)"}
+        </span>
       </span>
       {paramText !== null && (
         <span className="truncate font-mono text-slate-500" title={paramText}>
@@ -82,7 +84,8 @@ export function TraceTimeline({ trace, selectedIndex, onSelect, channels }: Prop
   const lanes = Array.from(new Set(steps.map((step) => step.actor ?? NO_ACTOR_LANE)));
 
   return (
-    <div className="overflow-x-auto">
+    // overflow-x-autoは縦方向もクリップするため、選択リング(ring+offset)が切れないよう内側に余白を置く
+    <div className="overflow-x-auto px-0.5 py-1">
       <div className="mb-2 max-w-56">
         <StepCard
           step={trace[0]!}
@@ -97,7 +100,7 @@ export function TraceTimeline({ trace, selectedIndex, onSelect, channels }: Prop
         // レーンは横方向に間延びさせない: 各ステップ列は最大10remで打ち止め、
         // 余白は右に残す(視線移動を短く保つ)。レーン名の列は横スクロールしても左に留まる
         <div
-          className="grid w-max items-start gap-x-1.5 gap-y-1"
+          className="grid w-max items-start gap-x-1.5 gap-y-2"
           style={{ gridTemplateColumns: `minmax(4.5rem, auto) repeat(${steps.length}, minmax(7rem, 10rem))` }}
         >
           {lanes.map((lane, laneIdx) => (
