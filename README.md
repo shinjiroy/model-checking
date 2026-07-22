@@ -37,7 +37,7 @@ npm install && npm run -w @model-checking/web dev
 
 ## 自分のリポジトリで検査する
 
-DSLは `@model-checking/spec` として配布する(GitHub Releaseに添付したtarball)。ブラウザ側はトランスパイルのみで型を見ないため、型チェックは手元のエディタとCIが担当する。
+DSLは `@model-checking/spec` として配布する(GitHub Releaseに添付したtarball)。ブラウザ側はトランスパイルのみで型を見ないため、型チェックは手元のエディタとCIが担当する。クローンは要らない。
 
 ```bash
 cp -r templates/spec-starter my-design && cd my-design
@@ -45,6 +45,15 @@ npm install && npm run typecheck && npm run check
 ```
 
 検査をvitestのテストとして書くので、設計の退行がCIで止まる。
+
+テストを書かずに手元で素早く回したいときは、同梱の CLI を使う。違反を検出すると非ゼロ終了するので、これもCIで落とせる。
+
+```bash
+npx model-checking check specs/                    # ディレクトリ配下の仕様をすべて検査
+npx model-checking check specs/order.ts --max-states 500000
+```
+
+利用方式は「試用(`npx --package=<tarball URL>`)/常用・CI(ローカルインストール)/ツール自体の開発(クローン)」の3つ。詳細は [spec-package.md](docs/spec-package.md#3つの利用方式) を参照。
 
 ## ドキュメント
 

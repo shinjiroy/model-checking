@@ -24,6 +24,9 @@
   "sideEffects": false,
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
+  "bin": {
+    "model-checking": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "@model-checking/source": "./src/index.ts",
@@ -45,5 +48,8 @@
     "prepack": "npm run build",
     "bench": "vite-node bench/scaleBenchmark.ts",
     "bench:enum": "vite-node bench/enumerationScaleBenchmark.ts"
+  },
+  "dependencies": {
+    "esbuild": "0.28.1"
   }
 }
