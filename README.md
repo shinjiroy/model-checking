@@ -27,6 +27,12 @@ docker compose up -d web    # http://localhost:5173
 npm install && npm run -w @model-checking/web dev
 ```
 
+`web` サービスは作業ツリーをマウントするので、編集はそのままHMRで反映される。依存を追加したときだけ、イメージのnode_modulesを作り直す。
+
+```bash
+docker compose up -d --build --force-recreate --renew-anon-volumes web
+```
+
 1. 仕様ファイル(.ts)をドラッグ&ドロップするか、ワンクリックデモを読み込む
 2. 「解析する」→「検査する」。検査中は探索済み状態数が表示され、キャンセルできる
 3. 状態機械(`defineSpec`)で不変条件違反・デッドロックが見つかると、反例トレースをactorレーンのタイムラインで表示する。ステップを選ぶと直前状態との差分が見える。データモデル(`defineModel`)でassertionの破れが見つかると、反例インスタンスを表で表示する

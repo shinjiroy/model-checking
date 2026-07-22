@@ -1,275 +1,73 @@
-:root {
-  font-family: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-  line-height: 1.5;
-  color: #1a1a1a;
-  background-color: #fafafa;
+@import "tailwindcss";
+
+/*
+ * 配色の階層(この4段だけを使い、それ以外の色でメッセージを塗らない):
+ *   通常情報  slate  … パネル・本文・枠線
+ *   注意      amber  … 打ち切り・URL長すぎ等、結果は有効だが読み手の判断が要るもの
+ *   違反/失敗 rose   … 不変条件違反・デッドロック・エラー(検査の結論が「だめ」なもの)
+ *   成功      emerald… 検査成功・コピー完了
+ * 選択・操作の主役は blue で、意味(合否)は持たせない。
+ */
+@theme {
+  --font-sans: system-ui, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  html {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  /* 状態数・ステップ番号が桁で揺れないようにする */
+  body {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-body {
-  margin: 0;
-}
+@layer components {
+  /*
+   * ボタンの最小タップ領域は44px(min-h-11)。小さく見せたい場合でも高さは削らず、
+   * paddingと文字サイズだけで調整する。
+   */
+  .btn {
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold transition-colors;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+    @apply disabled:cursor-not-allowed disabled:opacity-45;
+  }
 
-.app {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
+  .btn-primary {
+    @apply border-blue-600 bg-blue-600 text-white hover:not-disabled:border-blue-700 hover:not-disabled:bg-blue-700;
+  }
 
-h1 {
-  font-size: 1.5rem;
-}
+  .btn-secondary {
+    @apply border-slate-300 bg-white text-slate-800 hover:not-disabled:bg-slate-100;
+  }
 
-.app-description {
-  color: #555;
-}
+  .btn-danger {
+    @apply border-rose-300 bg-white text-rose-700 hover:not-disabled:bg-rose-50;
+  }
 
-section {
-  margin: 1.5rem 0;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-}
+  /* ステップ送りの←→など、正方形の44pxを確保するボタン */
+  .btn-square {
+    @apply min-w-11 px-0;
+  }
 
-.drop-zone {
-  padding: 2rem;
-  border: 2px dashed #aaa;
-  border-radius: 8px;
-  text-align: center;
-}
+  .panel {
+    @apply my-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+  }
 
-.drop-zone--active {
-  border-color: #2563eb;
-  background: #eff6ff;
-}
+  .panel-title {
+    @apply mb-2 text-base font-bold text-slate-900;
+  }
 
-.demo-buttons {
-  margin-top: 1rem;
-}
+  .field-input {
+    @apply min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600;
+    @apply aria-invalid:border-rose-400 aria-invalid:bg-rose-50;
+  }
 
-.demo-buttons button {
-  margin-right: 0.5rem;
-}
-
-.file-list {
-  list-style: none;
-  padding: 0;
-}
-
-.file-list li {
-  padding: 0.25rem 0;
-}
-
-.error-text {
-  color: #b91c1c;
-}
-
-.error-panel {
-  border-color: #b91c1c;
-  background: #fef2f2;
-}
-
-.error-location {
-  font-family: ui-monospace, monospace;
-  color: #7f1d1d;
-}
-
-.error-message {
-  white-space: pre-wrap;
-}
-
-.check-actions {
-  margin-top: 0.75rem;
-}
-
-.progress-text {
-  font-variant-numeric: tabular-nums;
-}
-
-.result-panel--ok {
-  border-color: #15803d;
-  background: #f0fdf4;
-}
-
-.result-panel--violation {
-  border-color: #b45309;
-  background: #fffbeb;
-}
-
-.warning-text {
-  color: #92400e;
-  font-weight: 600;
-}
-
-.share-result {
-  margin-top: 0.75rem;
-}
-
-.share-result input[type="text"] {
-  width: 100%;
-  font-family: ui-monospace, monospace;
-  padding: 0.4rem;
-}
-
-.share-status {
-  color: #15803d;
-}
-
-.watch-indicator {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.violation-banner {
-  color: #92400e;
-}
-
-.timeline {
-  overflow-x: auto;
-  margin: 1rem 0;
-}
-
-.timeline-initial {
-  margin-bottom: 0.75rem;
-}
-
-.timeline-lanes {
-  display: grid;
-  gap: 0.5rem;
-  align-items: start;
-}
-
-.lane-label {
-  font-weight: 600;
-  padding: 0.5rem 0.25rem;
-  color: #444;
-}
-
-.step-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-  text-align: left;
-  font-size: 0.85rem;
-  width: 100%;
-}
-
-.step-card--selected {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px #bfdbfe;
-}
-
-.step-card--violation {
-  border-color: #b91c1c;
-  background: #fef2f2;
-}
-
-.step-card__index {
-  font-weight: 600;
-  color: #666;
-}
-
-.step-card__action {
-  font-weight: 600;
-}
-
-.step-card__param {
-  font-family: ui-monospace, monospace;
-  color: #444;
-  word-break: break-all;
-}
-
-.step-nav {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 1rem 0;
-}
-
-.state-diff__list {
-  list-style: none;
-  padding: 0;
-}
-
-.state-diff__entry {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-family: ui-monospace, monospace;
-  font-size: 0.85rem;
-}
-
-.state-diff__entry--added {
-  background: #dcfce7;
-}
-
-.state-diff__entry--changed {
-  background: #fef9c3;
-}
-
-.state-diff__entry--removed {
-  background: #fee2e2;
-}
-
-.state-diff__path {
-  font-weight: 600;
-}
-
-.kind-label {
-  color: #666;
-  font-size: 0.85rem;
-}
-
-.instance-view {
-  margin-top: 1rem;
-}
-
-.atom-list {
-  list-style: none;
-  padding: 0;
-  font-family: ui-monospace, monospace;
-}
-
-.atom-list li {
-  padding: 0.15rem 0;
-}
-
-.relation-table-wrapper {
-  overflow-x: auto;
-  margin: 0.75rem 0;
-}
-
-.relation-table {
-  border-collapse: collapse;
-  font-family: ui-monospace, monospace;
-  font-size: 0.85rem;
-}
-
-.relation-table caption {
-  caption-side: top;
-  text-align: left;
-  font-weight: 600;
-  font-family: system-ui, sans-serif;
-  margin-bottom: 0.25rem;
-}
-
-.relation-table td {
-  border: 1px solid #ccc;
-  padding: 0.3rem 0.6rem;
-}
-
-.relation-table__empty {
-  color: #888;
-  font-style: italic;
+  /* ラジオの行。行全体で44pxを確保してタップしやすくする */
+  .choice-row {
+    @apply flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 text-sm hover:bg-slate-100;
+  }
 }

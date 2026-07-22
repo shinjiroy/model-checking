@@ -16,15 +16,22 @@ export function SpecPicker({ exports: found, selected, onChange }: Props) {
   if (found.length <= 1) return null;
 
   return (
-    <section>
-      <h2>検査対象の選択</h2>
-      <p>複数の検査対象がexportされています。検査するものを選んでください。</p>
-      <ul className="file-list">
+    <section className="panel">
+      <h2 className="panel-title">検査対象の選択</h2>
+      <p className="text-sm text-slate-600">複数の検査対象がexportされています。検査するものを選んでください。</p>
+      <ul className="mt-3 space-y-1">
         {found.map(({ name, kind }) => (
           <li key={name}>
-            <label>
-              <input type="radio" name="spec" checked={selected === name} onChange={() => onChange(name)} />
-              {name} <span className="kind-label">({KIND_LABEL[kind]})</span>
+            <label className="choice-row">
+              <input
+                type="radio"
+                name="spec"
+                className="size-4 accent-blue-600"
+                checked={selected === name}
+                onChange={() => onChange(name)}
+              />
+              <span className="font-mono">{name}</span>{" "}
+              <span className="text-xs text-slate-500">({KIND_LABEL[kind]})</span>
             </label>
           </li>
         ))}

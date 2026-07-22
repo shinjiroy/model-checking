@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { ChannelDef, TraceStep } from "@model-checking/spec";
 import { detectMessageArrows, formatMessageArrow } from "../core/messageArrows.js";
 
@@ -22,18 +23,38 @@ type StepCardProps = {
 };
 
 function StepCard({ step, index, selected, violation, arrows, onSelect }: StepCardProps) {
+  const ref = useRef<HTMLButtonElement>(null);
   const paramText = formatParam(step.param);
-  const classNames = ["step-card"];
-  if (selected) classNames.push("step-card--selected");
-  if (violation) classNames.push("step-card--violation");
+  const tone = violation
+    ? "border-rose-400 bg-rose-50 hover:bg-rose-100"
+    : "border-slate-200 bg-white hover:bg-slate-50";
+  // 選択状態は枠線ではなくリング+影で示す。違反(rose)の枠線と喧嘩させないため
+  const selection = selected ? "ring-2 ring-blue-600 ring-offset-1" : "";
+
+  // 選択中のステップがレーンの横スクロール外にあると現在位置を見失うため、選択のたびに画面内へ寄せる
+  useEffect(() => {
+    if (selected) ref.current?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  }, [selected]);
 
   return (
-    <button type="button" className={classNames.join(" ")} onClick={onSelect}>
-      <span className="step-card__index">#{index}</span>
-      <span className="step-card__action">{step.action ?? "(初期状態)"}</span>
-      {paramText !== null && <span className="step-card__param">{paramText}</span>}
+    <button
+      ref={ref}
+      type="button"
+      aria-current={selected ? "step" : undefined}
+      className={`flex min-h-11 w-full cursor-pointer flex-col gap-0.5 rounded-lg border px-2.5 py-2 text-left text-xs transition-colors ${tone} ${selection}`}
+      onClick={onSelect}
+    >
+      <span className="flex items-center gap-1.5">
+        <span className={`font-semibold ${violation ? "text-rose-700" : "text-slate-400"}`}>#{index}</span>
+        <span className="truncate font-semibold text-slate-900">{step.action ?? "(初期状態)"}</span>
+      </span>
+      {paramText !== null && (
+        <span className="truncate font-mono text-slate-500" title={paramText}>
+          {paramText}
+        </span>
+      )}
       {arrows.map((text) => (
-        <span key={text} className="step-card__arrow">
+        <span key={text} className="truncate font-mono text-[0.7rem] text-blue-700" title={text}>
           {text}
         </span>
       ))}
@@ -61,8 +82,8 @@ export function TraceTimeline({ trace, selectedIndex, onSelect, channels }: Prop
   const lanes = Array.from(new Set(steps.map((step) => step.actor ?? NO_ACTOR_LANE)));
 
   return (
-    <div className="timeline">
-      <div className="timeline-initial">
+    <div className="overflow-x-auto">
+      <div className="mb-2 max-w-56">
         <StepCard
           step={trace[0]!}
           index={0}
@@ -73,13 +94,19 @@ export function TraceTimeline({ trace, selectedIndex, onSelect, channels }: Prop
         />
       </div>
       {steps.length > 0 && (
+        // レーンは横方向に間延びさせない: 各ステップ列は最大10remで打ち止め、
+        // 余白は右に残す(視線移動を短く保つ)。レーン名の列は横スクロールしても左に留まる
         <div
-          className="timeline-lanes"
-          style={{ gridTemplateColumns: `120px repeat(${steps.length}, minmax(140px, 1fr))` }}
+          className="grid w-max items-start gap-x-1.5 gap-y-1"
+          style={{ gridTemplateColumns: `minmax(4.5rem, auto) repeat(${steps.length}, minmax(6.5rem, 10rem))` }}
         >
           {lanes.map((lane, laneIdx) => (
-            <div key={`label-${lane}`} className="lane-label" style={{ gridRow: laneIdx + 1, gridColumn: 1 }}>
-              {lane}
+            <div
+              key={`label-${lane}`}
+              className="sticky left-0 z-10 self-stretch bg-white pr-2 text-xs font-semibold text-slate-500"
+              style={{ gridRow: laneIdx + 1, gridColumn: 1 }}
+            >
+              <span className="flex min-h-11 items-center">{lane}</span>
             </div>
           ))}
           {steps.map((step, i) => {
