@@ -54,6 +54,71 @@ npm run verify:package
 
 CI([ci.yml](../.github/workflows/ci.yml))とリリース([release.yml](../.github/workflows/release.yml))の両方で走る。
 
+## 3つの利用方式
+
+仕様を検査する経路は3つある。用途で使い分ける。
+
+| 方式 | クローン | 毎回ダウンロード | バージョン固定 | 用途 |
+| --- | --- | --- | --- | --- |
+| `npx --package=<tarball URL> -c "model-checking check specs/"` | 不要 | する | × | 試用 |
+| ローカルインストール(`npm i -D <tarball URL>`、[spec-starter](../templates/spec-starter/) のコピーが最短) | 不要 | しない | ○ | 常用・CI |
+| リポジトリのクローン | 必要 | — | — | ツール自体の開発時のみ |
+
+**常用でもクローンは要らない。** 雛形をコピーして tarball を依存に入れれば、`node_modules/.bin/model-checking` が置かれる。ツール本体のソースが手元に要るのはこのツール自体を直す時だけである。
+
+> 企業内ネットワークでは、GitHub Releases のダウンロードが `objects.githubusercontent.com` へリダイレクトされる。`github.com` だけをプロキシで許可している環境ではこのホストが遮断され、tarball の取得に失敗することがある。その場合はプロキシ設定で `objects.githubusercontent.com` を許可する。
+
+## コマンドで検査する(CLI)
+
+`@model-checking/spec` は `model-checking` という CLI(`bin`)を持つ。ブラウザを開かず、テストも書かずに、手元で仕様をそのまま検査する用途に使う。
+
+```bash
+npx model-checking check specs/                        # ディレクトリ配下の仕様をすべて検査
+npx model-checking check specs/order.ts --max-states 500000
+```
+
+- ディレクトリを渡すと配下の `.ts` を再帰的に検査する(`*.test.ts` / `*.spec.ts` / `*.d.ts` は除外)。
+- `defineSpec`(状態機械)と `defineModel`(データモデル・権限)の両方を対象にする。ファイルが `export` した仕様・モデルを自動で拾う。
+- 違反(不変条件・デッドロック・assertionの破れ)を検出すると**非ゼロ終了**する。CI でそのまま落とせる。
+- 反例はターミナルに整形出力する(Web UI のタイムラインをテキストで再現)。
+
+```text
+$ npx model-checking check specs/
+specs/withdraw.ts
+  ✗ withdrawSpec  不変条件 balanceNeverNegative を破った(9 状態を探索)
+  反例トレース(最短 4 ステップ):
+     0  (初期状態)
+        {"balance":100,...}
+     1  checkA [処理A]
+        ...
+     4  withdrawB [処理B]
+        {"balance":-20,...}
+```
+
+### クローンせずに呼ぶ
+
+上の例はインストール済みを前提にしている。クローンしない基本の2方式は次のとおり(URLのバージョンは `deploy.sh` がリリースごとに書き換える)。
+
+```bash
+# 常用・CI: ローカルインストール(バージョン固定、都度ダウンロードしない)
+npm i -D "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz"
+npx model-checking check specs/
+
+# 試用: インストールせず都度ダウンロード
+npx --package="https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz" \
+  -c "model-checking check specs/"
+```
+
+試用形の `-c "..."` は省略できない。`npx --package=<URL> model-checking ...` と直接続けると、npx はパッケージ名からコマンド名(`bin`)を推測しようとし、パッケージ名(`@model-checking/spec`)と bin 名(`model-checking`)が一致しないため「could not determine executable to run」で失敗する。`-c` で「このパッケージを入れた文脈でこのコマンドを実行する」と明示する。
+
+**vitest 経由の `npm run check` は置き換えず併存させる。** CLI は「テストを書かずに手元で素早く回す」用途、vitest(`check()` を呼ぶテスト)は「CIで設計の退行を止める」用途と位置づける。
+
+### `@model-checking/spec` の import 自己解決
+
+利用者の仕様ファイルは `import { defineSpec } from "@model-checking/spec"` を含む。`npx --package=<tarball URL>` で一時ディレクトリに展開された状態だと、仕様ファイルの隣に `node_modules` がなく、このimportをNodeが解決できない。
+
+そこで CLI は仕様ファイルをロードする際、esbuild で `@model-checking/spec` を **CLI 自身のモジュール**(`dist/index.js`)へ alias し、バンドルにインライン展開してから読み込む([packages/spec/src/cli/loadSpecs.ts](../packages/spec/src/cli/loadSpecs.ts))。Webアプリが [apps/web/src/core/bundle.ts](../apps/web/src/core/bundle.ts) で esbuild-wasm を使って行っているのと同じ発想を Node 側で行う。TypeScript のトランスパイルも同じ esbuild が担うため、追加のトランスパイル手段は要らない。
+
 ## リリース手順
 
 [scripts/deploy.sh](../scripts/deploy.sh) を回して出てきた PR をマージするだけでよい。main で回せばリリース用ブランチも自動で切る。

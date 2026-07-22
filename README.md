@@ -37,7 +37,7 @@ npm install && npm run -w @model-checking/web dev
 
 ## 自分のリポジトリで検査する
 
-DSLは `@model-checking/spec` として配布する(GitHub Releaseに添付したtarball)。ブラウザ側はトランスパイルのみで型を見ないため、型チェックは手元のエディタとCIが担当する。
+DSLは `@model-checking/spec` として配布する(GitHub Releaseに添付したtarball)。ブラウザ側はトランスパイルのみで型を見ないため、型チェックは手元のエディタとCIが担当する。クローンは要らない。
 
 ```bash
 cp -r templates/spec-starter my-design && cd my-design
@@ -45,6 +45,21 @@ npm install && npm run typecheck && npm run check
 ```
 
 検査をvitestのテストとして書くので、設計の退行がCIで止まる。
+
+テストを書かずに手元で素早く回したいときは、同梱の CLI を使う。違反を検出すると非ゼロ終了するので、これもCIで落とせる。クローンは要らず、Releaseのtarballを指すだけでよい(`<version>` は [Releases](https://github.com/shinjiroy/model-checking/releases) の最新版に読み替える)。
+
+```bash
+# 常用・CI: ローカルインストール(バージョン固定)
+npm i -D "https://github.com/shinjiroy/model-checking/releases/download/spec-v<version>/model-checking-spec-<version>.tgz"
+npx model-checking check specs/                    # ディレクトリ配下の仕様をすべて検査
+npx model-checking check specs/order.ts --max-states 500000
+
+# 試用: インストールせず都度ダウンロード(-c は必須。省くと npx がコマンド名を推測できず失敗する)
+npx --package="https://github.com/shinjiroy/model-checking/releases/download/spec-v<version>/model-checking-spec-<version>.tgz" \
+  -c "model-checking check specs/"
+```
+
+3つ目の「クローンして使う」はツール自体を開発するときだけ。3方式の違いは [spec-package.md](docs/spec-package.md#3つの利用方式) を参照。
 
 ## ドキュメント
 
