@@ -95,6 +95,22 @@ specs/withdraw.ts
         {"balance":-20,...}
 ```
 
+### クローンせずに呼ぶ
+
+上の例はインストール済みを前提にしている。クローンしない基本の2方式は次のとおり(URLのバージョンは `deploy.sh` がリリースごとに書き換える)。
+
+```bash
+# 常用・CI: ローカルインストール(バージョン固定、都度ダウンロードしない)
+npm i -D "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz"
+npx model-checking check specs/
+
+# 試用: インストールせず都度ダウンロード
+npx --package="https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz" \
+  -c "model-checking check specs/"
+```
+
+試用形の `-c "..."` は省略できない。`npx --package=<URL> model-checking ...` と直接続けると、npx はパッケージ名からコマンド名(`bin`)を推測しようとし、パッケージ名(`@model-checking/spec`)と bin 名(`model-checking`)が一致しないため「could not determine executable to run」で失敗する。`-c` で「このパッケージを入れた文脈でこのコマンドを実行する」と明示する。
+
 **vitest 経由の `npm run check` は置き換えず併存させる。** CLI は「テストを書かずに手元で素早く回す」用途、vitest(`check()` を呼ぶテスト)は「CIで設計の退行を止める」用途と位置づける。
 
 ### `@model-checking/spec` の import 自己解決
