@@ -1,23 +1,30 @@
-name: Tag on version bump
+name: Release on merge
 
-# packages/spec の version が上がって main に入ったら、対応する spec-v<version>
-# タグを自動で切ってリリースする。タグを手で push する(git push --tags)手順を
-# なくし、「URLは更新したがReleaseを作り忘れる」齟齬(issue #39)を根絶する。
+# release/* ブランチの PR が main にマージされたときだけ、packages/spec の
+# version から spec-v<version> タグを切ってリリースする。
+#
+# トリガーを「version が変わった」ではなく「リリース用ブランチがマージされた」に
+# 絞っている。リリース意図をブランチ名で明示でき、リリースと無関係な
+# packages/spec/package.json の変更(依存追加・スクリプト変更など)で誤って
+# 発火しない。リリース用ブランチは scripts/deploy.sh が release/spec-v<version>
+# として切る。
 #
 # GITHUB_TOKEN で push したタグは release.yml の push トリガーを発火しない
 # (ワークフローの無限ループを防ぐGitHubの仕様)。そのため release.yml を
 # workflow_call で明示的に呼ぶ。追加のSecret(PAT)は要らない。
 on:
-  push:
-    branches: [main]
-    paths:
-      - packages/spec/package.json
+  pull_request:
+    types: [closed]
 
 permissions:
   contents: write # タグの作成・push に要る
 
 jobs:
   tag:
+    # release/* ブランチが実際にマージされたときだけ(閉じただけ・他ブランチは除く)
+    if: >-
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.decide.outputs.tag }}
@@ -25,6 +32,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # マージ後の main の状態(マージコミット)をタグ付けの対象にする
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0 # 既存タグの有無を見るため全履歴を取る
 
       - name: version からタグを決めて、無ければ切る
@@ -34,7 +43,7 @@ jobs:
           tag="spec-v$version"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
-          # 既にそのタグがあるなら何もしない(version以外の変更でも走るため冪等にする)
+          # 同じ version のタグが既にあるなら何もしない(取り違えや再実行に備えて冪等に)
           if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
             echo "$tag は既に存在する。スキップ" >&2
             echo "created=false" >> "$GITHUB_OUTPUT"
