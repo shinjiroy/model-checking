@@ -18,7 +18,7 @@ export function SpecPicker({ exports: found, selected, onChange }: Props) {
   return (
     <section className="panel">
       <h2 className="panel-title">検査対象の選択</h2>
-      <p className="text-sm text-slate-600">複数の検査対象がexportされています。検査するものを選んでください。</p>
+      <p className="text-base text-slate-600">複数の検査対象がexportされています。検査するものを選んでください。</p>
       <ul className="mt-3 space-y-1">
         {found.map(({ name, kind }) => (
           <li key={name}>
@@ -31,7 +31,7 @@ export function SpecPicker({ exports: found, selected, onChange }: Props) {
                 onChange={() => onChange(name)}
               />
               <span className="font-mono">{name}</span>{" "}
-              <span className="text-xs text-slate-500">({KIND_LABEL[kind]})</span>
+              <span className="text-sm text-slate-500">({KIND_LABEL[kind]})</span>
             </label>
           </li>
         ))}

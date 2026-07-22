@@ -52,7 +52,7 @@ export function CheckControls({
   return (
     <section className="panel">
       <h2 className="panel-title">検査</h2>
-      <label className="flex flex-wrap items-center gap-2 text-sm text-slate-700">
+      <label className="flex flex-wrap items-center gap-2 text-base text-slate-700">
         <span>{label}:</span>
         <input
           type="number"
@@ -66,7 +66,7 @@ export function CheckControls({
         />
       </label>
       {isInvalid && (
-        <p className="mt-2 text-sm font-semibold text-rose-700">{fieldName}は1以上の整数で入力してください</p>
+        <p className="mt-2 text-base font-semibold text-rose-700">{fieldName}は1以上の整数で入力してください</p>
       )}
       <div className="mt-4 flex items-center gap-3">
         {!checking ? (
@@ -79,7 +79,7 @@ export function CheckControls({
           </button>
         )}
         {checking && (
-          <p className="text-sm text-slate-600" role="status">
+          <p className="text-base text-slate-600" role="status">
             {progressLabel}: <span className="font-semibold text-slate-900">{statesExplored.toLocaleString("ja-JP")}</span>
           </p>
         )}

@@ -30,7 +30,7 @@
    * paddingと文字サイズだけで調整する。
    */
   .btn {
-    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold transition-colors;
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-lg border px-4 text-base font-semibold transition-colors;
     @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
     @apply disabled:cursor-not-allowed disabled:opacity-45;
   }
@@ -57,17 +57,17 @@
   }
 
   .panel-title {
-    @apply mb-2 text-base font-bold text-slate-900;
+    @apply mb-2 text-lg font-bold text-slate-900;
   }
 
   .field-input {
-    @apply min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm;
+    @apply min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-base;
     @apply focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600;
     @apply aria-invalid:border-rose-400 aria-invalid:bg-rose-50;
   }
 
   /* ラジオの行。行全体で44pxを確保してタップしやすくする */
   .choice-row {
-    @apply flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 text-sm hover:bg-slate-100;
+    @apply flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 text-base hover:bg-slate-100;
   }
 }

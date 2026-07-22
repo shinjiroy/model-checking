@@ -19,7 +19,7 @@ export function WatchControls({ dirName, onOpenDirectory, onStop, busy }: Props)
       <h2 className="panel-title">ウォッチモード</h2>
       {dirName ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-slate-600">
+          <p className="text-base text-slate-600">
             監視中: <strong className="font-mono text-slate-900">{dirName}</strong>(保存すると自動で再検査します)
           </p>
           <button type="button" className="btn btn-secondary" onClick={onStop}>

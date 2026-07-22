@@ -8,7 +8,7 @@ export function EntrySelector({ fileNames, entry, onChange }: Props) {
   return (
     <section className="panel">
       <h2 className="panel-title">読み込んだファイル</h2>
-      <p className="text-sm text-slate-600">
+      <p className="text-base text-slate-600">
         エントリファイル(defineSpecまたはdefineModelをexportしているファイル)を選択してください。
       </p>
       <ul className="mt-3 space-y-1">

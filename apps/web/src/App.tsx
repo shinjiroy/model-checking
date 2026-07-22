@@ -187,22 +187,22 @@ export function App() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900">モデル検査SPA</h1>
-      <p className="mt-2 text-sm text-slate-600">
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900">モデル検査SPA</h1>
+      <p className="mt-2 text-base text-slate-600">
         TypeScriptで書いた仕様(状態・アクション・不変条件)をブラウザ内で検査し、反例を可視化します。
       </p>
 
       {shareLoadError && (
         <section className="my-6 rounded-xl border border-rose-300 bg-rose-50 p-5" role="alert">
           <h2 className="panel-title text-rose-800">共有URLの読み込みエラー</h2>
-          <p className="text-sm whitespace-pre-wrap text-rose-900">{shareLoadError}</p>
+          <p className="text-base whitespace-pre-wrap text-rose-900">{shareLoadError}</p>
         </section>
       )}
 
       {directoryError && (
         <section className="my-6 rounded-xl border border-rose-300 bg-rose-50 p-5" role="alert">
           <h2 className="panel-title text-rose-800">フォルダの読み込みエラー</h2>
-          <p className="text-sm whitespace-pre-wrap text-rose-900">{directoryError}</p>
+          <p className="text-base whitespace-pre-wrap text-rose-900">{directoryError}</p>
         </section>
       )}
 

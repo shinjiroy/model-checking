@@ -54,7 +54,7 @@ export function DropZone({ onFilesLoaded }: Props) {
         onDragLeave={() => setIsDragOver(false)}
         onDrop={(event) => void handleDrop(event)}
       >
-        <p className="text-sm text-slate-600">仕様ファイル(.ts)をドラッグ&ドロップ、またはフォルダごとドロップ</p>
+        <p className="text-base text-slate-600">仕様ファイル(.ts)をドラッグ&ドロップ、またはフォルダごとドロップ</p>
         <button type="button" className="btn btn-secondary" onClick={() => inputRef.current?.click()}>
           ファイルを選択
         </button>
@@ -67,10 +67,10 @@ export function DropZone({ onFilesLoaded }: Props) {
           onChange={(event) => void handleFileInput(event)}
         />
       </div>
-      {loadError && <p className="mt-3 text-sm font-semibold text-rose-700">{loadError}</p>}
+      {loadError && <p className="mt-3 text-base font-semibold text-rose-700">{loadError}</p>}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-sm text-slate-600">ワンクリックデモ:</span>
+        <span className="text-base text-slate-600">ワンクリックデモ:</span>
         {demoSpecs.map((demo) => (
           <button
             key={demo.fileName}

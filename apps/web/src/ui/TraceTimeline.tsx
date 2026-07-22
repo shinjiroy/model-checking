@@ -41,7 +41,7 @@ function StepCard({ step, index, selected, violation, arrows, onSelect }: StepCa
       ref={ref}
       type="button"
       aria-current={selected ? "step" : undefined}
-      className={`flex min-h-11 w-full cursor-pointer flex-col gap-0.5 rounded-lg border px-2.5 py-2 text-left text-xs transition-colors ${tone} ${selection}`}
+      className={`flex min-h-11 w-full cursor-pointer flex-col gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm transition-colors ${tone} ${selection}`}
       onClick={onSelect}
     >
       <span className="flex items-center gap-1.5">
@@ -54,7 +54,7 @@ function StepCard({ step, index, selected, violation, arrows, onSelect }: StepCa
         </span>
       )}
       {arrows.map((text) => (
-        <span key={text} className="truncate font-mono text-[0.7rem] text-blue-700" title={text}>
+        <span key={text} className="truncate font-mono text-xs text-blue-700" title={text}>
           {text}
         </span>
       ))}
@@ -98,12 +98,12 @@ export function TraceTimeline({ trace, selectedIndex, onSelect, channels }: Prop
         // 余白は右に残す(視線移動を短く保つ)。レーン名の列は横スクロールしても左に留まる
         <div
           className="grid w-max items-start gap-x-1.5 gap-y-1"
-          style={{ gridTemplateColumns: `minmax(4.5rem, auto) repeat(${steps.length}, minmax(6.5rem, 10rem))` }}
+          style={{ gridTemplateColumns: `minmax(4.5rem, auto) repeat(${steps.length}, minmax(7rem, 10rem))` }}
         >
           {lanes.map((lane, laneIdx) => (
             <div
               key={`label-${lane}`}
-              className="sticky left-0 z-10 self-stretch bg-white pr-2 text-xs font-semibold text-slate-500"
+              className="sticky left-0 z-10 self-stretch bg-white pr-2 text-sm font-semibold text-slate-500"
               style={{ gridRow: laneIdx + 1, gridColumn: 1 }}
             >
               <span className="flex min-h-11 items-center">{lane}</span>

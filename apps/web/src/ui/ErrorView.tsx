@@ -15,11 +15,11 @@ export function ErrorView({ error }: Props) {
     <section className="my-6 rounded-xl border border-rose-300 bg-rose-50 p-5" role="alert">
       <h2 className="panel-title text-rose-800">{PHASE_LABEL[error.phase]}</h2>
       {error.location && (
-        <p className="font-mono text-sm text-rose-700">
+        <p className="font-mono text-base text-rose-700">
           位置: {error.location.file}:{error.location.line}:{error.location.column}
         </p>
       )}
-      <pre className="mt-2 overflow-x-auto text-sm whitespace-pre-wrap text-rose-900">{error.message}</pre>
+      <pre className="mt-2 overflow-x-auto text-base whitespace-pre-wrap text-rose-900">{error.message}</pre>
     </section>
   );
 }

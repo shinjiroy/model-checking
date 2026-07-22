@@ -17,9 +17,9 @@ export function ResultPanel({ result }: Props) {
     return (
       <section className="my-6 rounded-xl border border-emerald-300 bg-emerald-50 p-5">
         <h2 className="panel-title text-emerald-800">検査成功</h2>
-        <p className="text-sm text-emerald-900">探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
+        <p className="text-base text-emerald-900">探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
         {!result.complete && (
-          <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-800">
+          <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-base font-semibold text-amber-800">
             maxStatesにより打ち切りました。状態空間が有界か確認するか、上限を引き上げて再度検査してください。
           </p>
         )}
@@ -30,8 +30,8 @@ export function ResultPanel({ result }: Props) {
   return (
     <section className="my-6 overflow-hidden rounded-xl border border-rose-300 bg-white">
       <div className="border-b border-rose-300 bg-rose-50 px-5 py-4">
-        <h2 className="text-base font-bold text-rose-800">違反を検出: {violationLabel(result.violation)}</h2>
-        <p className="mt-1 text-sm text-rose-900">探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
+        <h2 className="text-lg font-bold text-rose-800">違反を検出: {violationLabel(result.violation)}</h2>
+        <p className="mt-1 text-base text-rose-900">探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
       </div>
       <div className="p-5">
         <ViolationTrace trace={result.trace} channels={result.channels} />
@@ -84,9 +84,9 @@ function ViolationTrace({
         </button>
         <div className="min-w-0 flex-1">
           <p className="flex items-baseline gap-1 font-semibold text-slate-900">
-            <span className="text-sm text-slate-500">ステップ</span>
+            <span className="text-base text-slate-500">ステップ</span>
             <span className="text-2xl leading-none">#{selectedIndex}</span>
-            <span className="text-sm text-slate-500">/ #{steps.length - 1}</span>
+            <span className="text-base text-slate-500">/ #{steps.length - 1}</span>
           </p>
           <div
             className="mt-2 flex gap-0.5"
@@ -116,7 +116,7 @@ function ViolationTrace({
           →
         </button>
       </div>
-      <p className="mb-4 text-xs text-slate-500">←→キーでもステップを送れます</p>
+      <p className="mb-4 text-sm text-slate-500">←→キーでもステップを送れます</p>
 
       <StateDiffView prevState={prev} state={selected.state} isInitial={selectedIndex === 0} />
     </div>

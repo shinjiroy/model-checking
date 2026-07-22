@@ -37,17 +37,17 @@ export function StateDiffView({ prevState, state, isInitial }: Props) {
 
   return (
     <div>
-      <h3 className="mb-2 text-sm font-bold text-slate-900">{isInitial ? "初期状態" : "直前ステップからの差分"}</h3>
+      <h3 className="mb-2 text-lg font-bold text-slate-900">{isInitial ? "初期状態" : "直前ステップからの差分"}</h3>
       {entries.length === 0 ? (
-        <p className="text-sm text-slate-500">変化なし</p>
+        <p className="text-base text-slate-500">変化なし</p>
       ) : (
         <ul className="space-y-1">
           {entries.map((entry) => (
             <li
               key={entry.path}
-              className={`flex flex-wrap items-baseline gap-2 rounded-lg px-2 py-1.5 font-mono text-xs ${KIND_STYLE[entry.kind]}`}
+              className={`flex flex-wrap items-baseline gap-2 rounded-lg px-2 py-1.5 font-mono text-sm ${KIND_STYLE[entry.kind]}`}
             >
-              <span className="rounded bg-white/70 px-1.5 py-0.5 text-[0.7rem] font-semibold">
+              <span className="rounded bg-white/70 px-1.5 py-0.5 text-xs font-semibold">
                 {KIND_LABEL[entry.kind]}
               </span>
               <span className="font-semibold">{entry.path}</span>

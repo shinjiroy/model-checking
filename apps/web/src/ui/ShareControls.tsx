@@ -48,35 +48,35 @@ export function ShareControls({ files, entry, specName, maxStates }: Props) {
   return (
     <section className="panel">
       <h2 className="panel-title">共有</h2>
-      <p className="mb-3 text-sm text-slate-600">
+      <p className="mb-3 text-base text-slate-600">
         エントリから参照されている仕様ファイルをURLに埋め込みます(サーバーへは送信されません)。
       </p>
       <button type="button" className="btn btn-secondary" onClick={() => void handleCreate()} disabled={busy}>
         {busy ? "作成中…" : "共有URLを作成"}
       </button>
 
-      {createError && <p className="mt-2 text-sm font-semibold text-rose-700">{createError}</p>}
+      {createError && <p className="mt-2 text-base font-semibold text-rose-700">{createError}</p>}
 
       {shareUrl && (
         <div className="mt-3 space-y-2">
           <input
             type="text"
             readOnly
-            className="field-input w-full font-mono text-xs"
+            className="field-input w-full font-mono text-sm"
             value={shareUrl}
             onFocus={(event) => event.currentTarget.select()}
             aria-label="共有URL"
           />
           {copyStatus === "copied" && (
-            <p className="text-sm font-semibold text-emerald-700">クリップボードにコピーしました</p>
+            <p className="text-base font-semibold text-emerald-700">クリップボードにコピーしました</p>
           )}
           {copyStatus === "failed" && (
-            <p className="text-sm font-semibold text-rose-700">
+            <p className="text-base font-semibold text-rose-700">
               クリップボードへのコピーに失敗しました。上のテキストボックスから手動でコピーしてください
             </p>
           )}
           {isShareUrlTooLong(shareUrl) && (
-            <p className="text-sm font-semibold text-amber-700">
+            <p className="text-base font-semibold text-amber-700">
               URLが長いため、チャット等に貼り付けると途中で切れる可能性があります
             </p>
           )}
