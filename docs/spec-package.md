@@ -101,11 +101,11 @@ specs/withdraw.ts
 
 ```bash
 # 常用・CI: ローカルインストール(バージョン固定、都度ダウンロードしない)
-npm i -D "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz"
+npm i -D "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.2/model-checking-spec-0.1.2.tgz"
 npx model-checking check specs/
 
 # 試用: インストールせず都度ダウンロード
-npx --package="https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz" \
+npx --package="https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.2/model-checking-spec-0.1.2.tgz" \
   -c "model-checking check specs/"
 ```
 
@@ -124,7 +124,7 @@ npx --package="https://github.com/shinjiroy/model-checking/releases/download/spe
 [scripts/deploy.sh](../scripts/deploy.sh) を回して出てきた PR をマージするだけでよい。main で回せばリリース用ブランチも自動で切る。
 
 ```bash
-# main で回すと release/spec-v0.1.1 を切り、コミットして PR まで出す
+# main で回すと release/spec-v0.1.2 を切り、コミットして PR まで出す
 ./scripts/deploy.sh patch --pr
 ```
 
@@ -161,7 +161,7 @@ npx --package="https://github.com/shinjiroy/model-checking/releases/download/spe
 
 ```json
 "dependencies": {
-  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.1/model-checking-spec-0.1.1.tgz"
+  "@model-checking/spec": "https://github.com/shinjiroy/model-checking/releases/download/spec-v0.1.2/model-checking-spec-0.1.2.tgz"
 }
 ```
 
