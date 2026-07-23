@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { defaultClientConditions, defaultServerConditions, defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 
 const monorepoRoot = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -22,7 +23,7 @@ export default defineConfig({
       conditions: ["@model-checking/source", ...defaultServerConditions],
     },
   },
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   server: {
     host: "0.0.0.0",
     fs: {

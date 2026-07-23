@@ -28,8 +28,17 @@ services:
     volumes:
       - ./apps/web/dist:/app/apps/web/dist
 
+  # 開発サーバー(http://localhost:5173)。作業ツリーをマウントするので、
+  # ホスト側の編集がそのままHMRで反映される。node_modulesはイメージ側(npm ci の結果)を
+  # 使うため匿名ボリュームで隠す。依存を足したときだけ再ビルドが要る:
+  #   docker compose up -d --build --force-recreate --renew-anon-volumes web
   web:
     build: .
     command: npm run dev --workspace=@model-checking/web -- --host 0.0.0.0 --port 5173
     ports:
       - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/web/node_modules
+      - /app/packages/spec/node_modules

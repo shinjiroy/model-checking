@@ -42,9 +42,11 @@ export function DropZone({ onFilesLoaded }: Props) {
   }
 
   return (
-    <section>
+    <section className="panel">
       <div
-        className={`drop-zone${isDragOver ? " drop-zone--active" : ""}`}
+        className={`flex flex-col items-center gap-3 rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
+          isDragOver ? "border-blue-500 bg-blue-50" : "border-slate-300 bg-slate-50"
+        }`}
         onDragOver={(event) => {
           event.preventDefault();
           setIsDragOver(true);
@@ -52,8 +54,8 @@ export function DropZone({ onFilesLoaded }: Props) {
         onDragLeave={() => setIsDragOver(false)}
         onDrop={(event) => void handleDrop(event)}
       >
-        <p>仕様ファイル(.ts)をドラッグ&ドロップ、またはフォルダごとドロップ</p>
-        <button type="button" onClick={() => inputRef.current?.click()}>
+        <p className="text-base text-slate-600">仕様ファイル(.ts)をドラッグ&ドロップ、またはフォルダごとドロップ</p>
+        <button type="button" className="btn btn-secondary" onClick={() => inputRef.current?.click()}>
           ファイルを選択
         </button>
         <input
@@ -65,12 +67,17 @@ export function DropZone({ onFilesLoaded }: Props) {
           onChange={(event) => void handleFileInput(event)}
         />
       </div>
-      {loadError && <p className="error-text">{loadError}</p>}
+      {loadError && <p className="mt-3 text-base font-semibold text-rose-700">{loadError}</p>}
 
-      <div className="demo-buttons">
-        <span>ワンクリックデモ: </span>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="text-base text-slate-600">ワンクリックデモ:</span>
         {demoSpecs.map((demo) => (
-          <button key={demo.fileName} type="button" onClick={() => onFilesLoaded({ [demo.fileName]: demo.source })}>
+          <button
+            key={demo.fileName}
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => onFilesLoaded({ [demo.fileName]: demo.source })}
+          >
             {demo.label}
           </button>
         ))}

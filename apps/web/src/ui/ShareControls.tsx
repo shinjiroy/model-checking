@@ -46,30 +46,39 @@ export function ShareControls({ files, entry, specName, maxStates }: Props) {
   }
 
   return (
-    <section>
-      <h2>共有</h2>
-      <p>エントリから参照されている仕様ファイルをURLに埋め込みます(サーバーへは送信されません)。</p>
-      <button type="button" onClick={() => void handleCreate()} disabled={busy}>
+    <section className="panel">
+      <h2 className="panel-title">共有</h2>
+      <p className="mb-3 text-base text-slate-600">
+        エントリから参照されている仕様ファイルをURLに埋め込みます(サーバーへは送信されません)。
+      </p>
+      <button type="button" className="btn btn-secondary" onClick={() => void handleCreate()} disabled={busy}>
         {busy ? "作成中…" : "共有URLを作成"}
       </button>
 
-      {createError && <p className="error-text">{createError}</p>}
+      {createError && <p className="mt-2 text-base font-semibold text-rose-700">{createError}</p>}
 
       {shareUrl && (
-        <div className="share-result">
+        <div className="mt-3 space-y-2">
           <input
             type="text"
             readOnly
+            className="field-input w-full font-mono text-sm"
             value={shareUrl}
             onFocus={(event) => event.currentTarget.select()}
             aria-label="共有URL"
           />
-          {copyStatus === "copied" && <p className="share-status">クリップボードにコピーしました</p>}
+          {copyStatus === "copied" && (
+            <p className="text-base font-semibold text-emerald-700">クリップボードにコピーしました</p>
+          )}
           {copyStatus === "failed" && (
-            <p className="error-text">クリップボードへのコピーに失敗しました。上のテキストボックスから手動でコピーしてください</p>
+            <p className="text-base font-semibold text-rose-700">
+              クリップボードへのコピーに失敗しました。上のテキストボックスから手動でコピーしてください
+            </p>
           )}
           {isShareUrlTooLong(shareUrl) && (
-            <p className="warning-text">URLが長いため、チャット等に貼り付けると途中で切れる可能性があります</p>
+            <p className="text-base font-semibold text-amber-700">
+              URLが長いため、チャット等に貼り付けると途中で切れる可能性があります
+            </p>
           )}
         </div>
       )}

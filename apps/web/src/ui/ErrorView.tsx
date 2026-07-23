@@ -12,14 +12,14 @@ type Props = {
 
 export function ErrorView({ error }: Props) {
   return (
-    <section className="error-panel" role="alert">
-      <h2>{PHASE_LABEL[error.phase]}</h2>
+    <section className="my-6 rounded-xl border border-rose-300 bg-rose-50 p-5" role="alert">
+      <h2 className="panel-title text-rose-800">{PHASE_LABEL[error.phase]}</h2>
       {error.location && (
-        <p className="error-location">
+        <p className="font-mono text-base text-rose-700">
           位置: {error.location.file}:{error.location.line}:{error.location.column}
         </p>
       )}
-      <p className="error-message">{error.message}</p>
+      <pre className="mt-2 overflow-x-auto text-base whitespace-pre-wrap text-rose-900">{error.message}</pre>
     </section>
   );
 }

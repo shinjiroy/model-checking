@@ -15,11 +15,11 @@ type Props = {
 export function ResultPanel({ result }: Props) {
   if (result.ok) {
     return (
-      <section className="result-panel result-panel--ok">
-        <h2>検査成功</h2>
-        <p>探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
+      <section className="my-6 rounded-xl border border-emerald-300 bg-emerald-50 p-5">
+        <h2 className="panel-title text-emerald-800">検査成功</h2>
+        <p className="text-base text-emerald-900">探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
         {!result.complete && (
-          <p className="warning-text">
+          <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-base font-semibold text-amber-800">
             maxStatesにより打ち切りました。状態空間が有界か確認するか、上限を引き上げて再度検査してください。
           </p>
         )}
@@ -28,10 +28,14 @@ export function ResultPanel({ result }: Props) {
   }
 
   return (
-    <section className="result-panel result-panel--violation">
-      <h2 className="violation-banner">違反を検出: {violationLabel(result.violation)}</h2>
-      <p>探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
-      <ViolationTrace trace={result.trace} channels={result.channels} />
+    <section className="my-6 overflow-hidden rounded-xl border border-rose-300 bg-white">
+      <div className="border-b border-rose-300 bg-rose-50 px-5 py-4">
+        <h2 className="text-lg font-bold text-rose-800">違反を検出: {violationLabel(result.violation)}</h2>
+        <p className="mt-1 text-base text-rose-900">探索済み状態数: {result.statesExplored.toLocaleString("ja-JP")}</p>
+      </div>
+      <div className="p-5">
+        <ViolationTrace trace={result.trace} channels={result.channels} />
+      </div>
     </section>
   );
 }
@@ -64,24 +68,55 @@ function ViolationTrace({
   const prev = selectedIndex > 0 ? steps[selectedIndex - 1]!.state : undefined;
 
   return (
-    <div className="violation-trace">
+    <div>
       <TraceTimeline trace={steps} selectedIndex={selectedIndex} onSelect={setSelectedIndex} channels={channels} />
 
-      <div className="step-nav">
-        <button type="button" onClick={() => setSelectedIndex((i) => Math.max(0, i - 1))} disabled={selectedIndex === 0}>
-          ← 前のステップ
-        </button>
-        <span>
-          #{selectedIndex} / #{steps.length - 1}
-        </span>
+      {/* ステップ送り。現在位置は大きな数字とバーの両方で示し、どこを見ているかを一目で分かるようにする */}
+      <div className="my-4 flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
         <button
           type="button"
+          className="btn btn-secondary btn-square"
+          aria-label="前のステップ"
+          onClick={() => setSelectedIndex((i) => Math.max(0, i - 1))}
+          disabled={selectedIndex === 0}
+        >
+          ←
+        </button>
+        <div className="min-w-0 flex-1">
+          <p className="flex items-baseline gap-1 font-semibold text-slate-900">
+            <span className="text-base text-slate-500">ステップ</span>
+            <span className="text-2xl leading-none">#{selectedIndex}</span>
+            <span className="text-base text-slate-500">/ #{steps.length - 1}</span>
+          </p>
+          <div
+            className="mt-2 flex gap-0.5"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={steps.length - 1}
+            aria-valuenow={selectedIndex}
+            aria-label="トレース内の現在位置"
+          >
+            {steps.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 flex-1 rounded-full ${
+                  i === selectedIndex ? "bg-blue-600" : i < selectedIndex ? "bg-blue-200" : "bg-slate-200"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+        <button
+          type="button"
+          className="btn btn-secondary btn-square"
+          aria-label="次のステップ"
           onClick={() => setSelectedIndex((i) => Math.min(steps.length - 1, i + 1))}
           disabled={selectedIndex === steps.length - 1}
         >
-          次のステップ →
+          →
         </button>
       </div>
+      <p className="mb-4 text-sm text-slate-500">←→キーでもステップを送れます</p>
 
       <StateDiffView prevState={prev} state={selected.state} isInitial={selectedIndex === 0} />
     </div>

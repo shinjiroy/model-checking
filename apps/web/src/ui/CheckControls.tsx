@@ -50,37 +50,40 @@ export function CheckControls({
   }
 
   return (
-    <section>
-      <h2>検査</h2>
-      <label>
-        {label}:{" "}
+    <section className="panel">
+      <h2 className="panel-title">検査</h2>
+      <label className="flex flex-wrap items-center gap-2 text-base text-slate-700">
+        <span>{label}:</span>
         <input
           type="number"
           min={1}
           step={1}
+          className="field-input w-44"
           value={rawInput}
           disabled={checking}
           onChange={handleChange}
           aria-invalid={isInvalid}
         />
       </label>
-      {isInvalid && <p className="error-text">{fieldName}は1以上の整数で入力してください</p>}
-      <div className="check-actions">
+      {isInvalid && (
+        <p className="mt-2 text-base font-semibold text-rose-700">{fieldName}は1以上の整数で入力してください</p>
+      )}
+      <div className="mt-4 flex items-center gap-3">
         {!checking ? (
-          <button type="button" onClick={onRunCheck} disabled={disabled || isInvalid}>
+          <button type="button" className="btn btn-primary" onClick={onRunCheck} disabled={disabled || isInvalid}>
             検査する
           </button>
         ) : (
-          <button type="button" onClick={onCancel}>
+          <button type="button" className="btn btn-danger" onClick={onCancel}>
             キャンセル
           </button>
         )}
+        {checking && (
+          <p className="text-base text-slate-600" role="status">
+            {progressLabel}: <span className="font-semibold text-slate-900">{statesExplored.toLocaleString("ja-JP")}</span>
+          </p>
+        )}
       </div>
-      {checking && (
-        <p className="progress-text" role="status">
-          {progressLabel}: {statesExplored.toLocaleString("ja-JP")}
-        </p>
-      )}
     </section>
   );
 }
